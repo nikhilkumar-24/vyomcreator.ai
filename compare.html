@@ -14,81 +14,145 @@
 <meta property="og:image" content="https://www.vyomcreator.ai/vyom-main.png">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="app.css">
 <style>
-.cmp-product { margin-top: 8px; }
-.cmp-product-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
-.cmp-product-head h3 { margin: 0; font-size: 18px; }
-.cmp-variant { color: var(--muted); font-size: 13px; }
-.cmp-list { display: grid; gap: 10px; }
-.cmp-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.02); text-decoration: none; color: inherit; transition: border-color .2s, background .2s; }
-.cmp-row:hover { border-color: #3f3f46; background: rgba(255,255,255,.04); }
-.cmp-row.is-best { border-color: #16a34a; }
-.cmp-logo { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; color: #0a0a0a; font-weight: 700; font-size: 13px; letter-spacing: .02em; overflow: hidden; }
-.cmp-logo img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
-.cmp-store { font-weight: 600; font-size: 15px; }
-.cmp-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
-.cmp-price { text-align: right; }
-.cmp-amount { font-size: 18px; font-weight: 700; }
-.cmp-mrp { font-size: 12px; color: var(--subtle); text-decoration: line-through; margin-left: 6px; }
-.cmp-best { display: inline-block; font-size: 11px; font-weight: 600; color: #16a34a; margin-top: 2px; }
-.cmp-buy { display: inline-block; margin-top: 4px; font-size: 13px; color: var(--muted); }
-.cmp-row:hover .cmp-buy { color: #fafafa; }
-.cmp-note { margin-top: 18px; font-size: 12px; color: var(--subtle); }
-@media (max-width: 480px) { .cmp-row { grid-template-columns: auto 1fr; } .cmp-price { grid-column: 2; text-align: left; } }
+.cmp-head { margin-top: 4px; }
+.cmp-head h1 { font-size: clamp(26px, 4vw, 36px); line-height: 1.15; letter-spacing: -.01em; }
+.cmp-head .sub { margin-top: 8px; }
+.cmp-board { margin-top: 28px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); overflow: hidden; }
+.cmp-summary { display: grid; grid-template-columns: repeat(3, 1fr); border-bottom: 1px solid var(--line); }
+.cmp-stat { padding: 16px 18px; }
+.cmp-stat + .cmp-stat { border-left: 1px solid var(--line); }
+.cmp-stat-label { font-size: 12px; color: var(--muted); }
+.cmp-stat-value { font-size: 20px; font-weight: 700; margin-top: 2px; }
+.cmp-stat-sub { font-size: 12px; color: var(--subtle); margin-top: 2px; }
+.cmp-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 18px; border-bottom: 1px solid var(--line); }
+.cmp-status { font-size: 12px; color: var(--muted); }
+.cmp-sort { display: inline-flex; gap: 4px; background: #18181b; border-radius: 8px; padding: 3px; }
+.cmp-sort-btn { border: 0; background: transparent; color: var(--muted); font-size: 13px; padding: 6px 12px; border-radius: 6px; }
+.cmp-sort-btn.is-on { background: #27272a; color: var(--text); }
+.cmp-list { display: grid; }
+.cmp-row { display: grid; grid-template-columns: 52px 1fr auto auto; align-items: center; gap: 16px; padding: 16px 18px; border-bottom: 1px solid var(--line); text-decoration: none; color: inherit; transition: background .2s; }
+.cmp-row:last-child { border-bottom: 0; }
+.cmp-row:hover { background: rgba(255,255,255,.03); }
+.cmp-row.is-best { background: rgba(22,163,74,.06); }
+.cmp-logo { width: 52px; height: 52px; border-radius: 10px; display: grid; place-items: center; color: #0a0a0a; font-weight: 700; font-size: 13px; overflow: hidden; }
+.cmp-logo img { width: 100%; height: 100%; object-fit: contain; background: #fff; padding: 4px; }
+.cmp-store { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-weight: 600; font-size: 15px; }
+.cmp-tag { font-size: 11px; font-weight: 600; color: #052e16; background: #4ade80; padding: 2px 8px; border-radius: 999px; }
+.cmp-meta { font-size: 12px; color: var(--muted); margin-top: 3px; }
+.cmp-price { text-align: right; min-width: 110px; }
+.cmp-amount { font-size: 20px; font-weight: 700; }
+.cmp-mrp { font-size: 12px; color: var(--subtle); text-decoration: line-through; }
+.cmp-off { font-size: 12px; color: #4ade80; margin-top: 2px; }
+.cmp-cta { display: inline-block; font-size: 13px; font-weight: 600; background: #fafafa; color: #0a0a0a; padding: 9px 14px; border-radius: 8px; white-space: nowrap; }
+.cmp-row:not(.has-price) .cmp-cta { background: transparent; color: var(--muted); border: 1px solid var(--line); }
+.cmp-footnote { padding: 14px 18px; font-size: 12px; color: var(--subtle); border-top: 1px solid var(--line); }
+@media (max-width: 640px) {
+  .cmp-summary { grid-template-columns: 1fr; }
+  .cmp-stat + .cmp-stat { border-left: 0; border-top: 1px solid var(--line); }
+  .cmp-row { grid-template-columns: 44px 1fr; gap: 12px 14px; }
+  .cmp-logo { width: 44px; height: 44px; }
+  .cmp-price { grid-column: 2; text-align: left; min-width: 0; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+  .cmp-price .cmp-off { margin-top: 0; }
+  .cmp-cta { grid-column: 2; justify-self: start; }
+}
 </style>
 </head>
 <body><main class="wrap">
 <header class="nav"><div class="brand"><a href="/" class="vyom-logo" aria-label="VYOM Creator AI home"><span class="vyom-logo-word">VYOM<i class="vyom-logo-star">✦</i></span><span class="vyom-logo-sub">Creator AI</span></a></div><div class="nav-row"><nav class="nav-links"><a href="/" class="navlink">Home</a><a href="/hooks" class="navlink">Hooks</a><a href="/sfx" class="navlink">SFX</a><a href="/beatline" class="navlink">Beatline</a><a href="/captions" class="navlink">Captions</a><a href="/compare" class="navlink active">Compare</a></nav><div class="pill">✦ CREATOR GROWTH LAB · BETA</div></div></header>
-<section class="hero"><div><div class="eyebrow">Price comparison</div><h1>Compare <span class="grad">before you buy.</span></h1><p>See the same supplement across stores, sorted by price. Tap a store to buy it there.</p></div></section>
-<section class="panel"><h2>Prices</h2><p class="sub" id="cmpStatus">Loading prices…</p><div id="cmpProducts"></div></section>
-<footer class="footer">VYOM.AI · Built for creators · <span id="cmpUpdated"></span></footer>
+<section class="cmp-head">
+  <div class="eyebrow">Protein price comparison</div>
+  <h1 id="cmpName">Loading…</h1>
+  <p class="sub" id="cmpVariant"></p>
+</section>
+<section class="cmp-board">
+  <div class="cmp-summary" id="cmpSummary"></div>
+  <div class="cmp-toolbar">
+    <span class="cmp-status" id="cmpStatus">Loading prices…</span>
+    <div class="cmp-sort" role="group" aria-label="Sort prices">
+      <button class="cmp-sort-btn is-on" type="button" data-sort="asc">Cheapest first</button>
+      <button class="cmp-sort-btn" type="button" data-sort="desc">Highest first</button>
+    </div>
+  </div>
+  <div class="cmp-list" id="cmpList"></div>
+  <div class="cmp-footnote" id="cmpUpdated"></div>
+</section>
 </main>
+<footer class="footer">VYOM.AI · Built for creators</footer>
 <script>
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const inr = n => '₹' + Number(n).toLocaleString('en-IN');
+const state = { product: null, sortDir: 'asc', liveOk: false };
 
-function renderRetailer(r, bestPrice) {
+function logoHtml(r) {
+  if (r.logo) return `<div class="cmp-logo"><img src="${escapeHtml(r.logo)}" alt="${escapeHtml(r.name)} logo"></div>`;
+  const initials = escapeHtml(r.name.split(' ').map(w => w[0]).join('').slice(0, 3).toUpperCase());
+  return `<div class="cmp-logo" style="background:${escapeHtml(r.color || '#71717a')}">${initials}</div>`;
+}
+
+function rowHtml(r, isBest) {
   const hasPrice = typeof r.price === 'number';
-  const isBest = hasPrice && r.price === bestPrice;
-  const logo = r.logo
-    ? `<img src="${escapeHtml(r.logo)}" alt="${escapeHtml(r.name)} logo">`
-    : escapeHtml(r.name.split(' ').map(w => w[0]).join('').slice(0, 3).toUpperCase());
-  const logoStyle = r.logo ? '' : `style="background:${escapeHtml(r.color || '#71717a')}"`;
-  const price = hasPrice
-    ? `<div class="cmp-amount">${inr(r.price)}${r.mrp ? `<span class="cmp-mrp">${inr(r.mrp)}</span>` : ''}</div>${isBest ? '<div class="cmp-best">Lowest price</div>' : ''}`
-    : `<div class="cmp-meta">Price not added yet</div>`;
-  return `<a class="cmp-row${isBest ? ' is-best' : ''}" href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">
-    <div class="cmp-logo" ${logoStyle}>${logo}</div>
-    <div><div class="cmp-store">${escapeHtml(r.name)}</div>${r.note ? `<div class="cmp-meta">${escapeHtml(r.note)}</div>` : ''}<div class="cmp-buy">Buy on ${escapeHtml(r.name)} →</div></div>
-    <div class="cmp-price">${price}</div>
+  const off = hasPrice && r.mrp ? Math.round((r.mrp - r.price) / r.mrp * 100) : 0;
+  const tags = (isBest ? '<span class="cmp-tag">Cheapest</span>' : '');
+  const right = hasPrice
+    ? `<div class="cmp-amount">${inr(r.price)}</div>${r.mrp ? `<div class="cmp-mrp">${inr(r.mrp)}</div>` : ''}${off > 0 ? `<div class="cmp-off">${off}% off MRP</div>` : ''}`
+    : `<div class="cmp-meta">No price found</div>`;
+  return `<a class="cmp-row${hasPrice ? ' has-price' : ''}${isBest ? ' is-best' : ''}" href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">
+    ${logoHtml(r)}
+    <div><div class="cmp-store">${escapeHtml(r.name)}${tags}</div>${r.note ? `<div class="cmp-meta">${escapeHtml(r.note)}</div>` : ''}</div>
+    <div class="cmp-price">${right}</div>
+    <span class="cmp-cta">${hasPrice ? 'View deal →' : 'Check on store →'}</span>
   </a>`;
 }
 
-function renderProduct(p) {
-  const priced = p.retailers.filter(r => typeof r.price === 'number').sort((a, b) => a.price - b.price);
-  const unpriced = p.retailers.filter(r => typeof r.price !== 'number');
-  const bestPrice = priced.length ? priced[0].price : null;
-  return `<article class="cmp-product">
-    <div class="cmp-product-head"><h3>${escapeHtml(p.name)}</h3><span class="cmp-variant">${escapeHtml(p.variant || '')}</span></div>
-    <div class="cmp-list">${[...priced, ...unpriced].map(r => renderRetailer(r, bestPrice)).join('')}</div>
-  </article>`;
+function renderSummary(priced) {
+  if (!priced.length) { document.getElementById('cmpSummary').innerHTML = ''; return; }
+  const low = priced.reduce((a, b) => (b.price < a.price ? b : a));
+  const high = priced.reduce((a, b) => (b.price > a.price ? b : a));
+  const saving = high.price - low.price;
+  document.getElementById('cmpSummary').innerHTML = `
+    <div class="cmp-stat"><div class="cmp-stat-label">Lowest price</div><div class="cmp-stat-value">${inr(low.price)}</div><div class="cmp-stat-sub">at ${escapeHtml(low.name)}</div></div>
+    <div class="cmp-stat"><div class="cmp-stat-label">Highest price</div><div class="cmp-stat-value">${inr(high.price)}</div><div class="cmp-stat-sub">at ${escapeHtml(high.name)}</div></div>
+    <div class="cmp-stat"><div class="cmp-stat-label">You save by comparing</div><div class="cmp-stat-value">${inr(saving)}</div><div class="cmp-stat-sub">${priced.length} stores with a price</div></div>`;
 }
+
+function renderList() {
+  const p = state.product;
+  const priced = p.retailers.filter(r => typeof r.price === 'number')
+    .sort((a, b) => (state.sortDir === 'asc' ? a.price - b.price : b.price - a.price));
+  const unpriced = p.retailers.filter(r => typeof r.price !== 'number');
+  const bestPrice = Math.min(...priced.map(r => r.price));
+  document.getElementById('cmpList').innerHTML = [...priced, ...unpriced]
+    .map(r => rowHtml(r, typeof r.price === 'number' && r.price === bestPrice && priced.length > 1)).join('');
+  document.querySelectorAll('.cmp-sort-btn').forEach(b => b.classList.toggle('is-on', b.dataset.sort === state.sortDir));
+}
+
+document.querySelectorAll('.cmp-sort-btn').forEach(btn => btn.addEventListener('click', () => {
+  state.sortDir = btn.dataset.sort;
+  renderList();
+}));
 
 fetch('compare-prices.json', { cache: 'no-cache' })
   .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
   .then(data => {
+    state.product = data.products[0];
     return fetch('/api/price/muscleblaze')
       .then(res => (res.ok ? res.json() : null))
       .catch(() => null)
       .then(live => {
         if (live && live.ok) {
-          data.products.forEach(p => p.retailers.forEach(r => {
-            if (r.name === 'MuscleBlaze') r.price = live.price;
-          }));
+          state.liveOk = true;
+          state.product.retailers.forEach(r => { if (r.name === 'MuscleBlaze') r.price = live.price; });
         }
-        document.getElementById('cmpProducts').innerHTML = data.products.map(renderProduct).join('');
-        const liveNote = live && live.ok ? ' MuscleBlaze price checked live.' : ' Live MuscleBlaze price unavailable, showing last saved price.';
-        document.getElementById('cmpStatus').textContent = 'Prices may differ from checkout. Quick-commerce prices vary by location.' + liveNote;
-        document.getElementById('cmpUpdated').textContent = 'Prices last updated ' + data.lastUpdated;
+        const p = state.product;
+        document.getElementById('cmpName').textContent = p.name;
+        document.getElementById('cmpVariant').textContent = p.variant || '';
+        document.title = p.name + ' price comparison | vyom.ai';
+        renderSummary(p.retailers.filter(r => typeof r.price === 'number'));
+        renderList();
+        document.getElementById('cmpStatus').textContent = state.liveOk
+          ? 'MuscleBlaze price checked live. Other stores use last saved prices.'
+          : 'Live MuscleBlaze price unavailable, showing last saved price.';
+        document.getElementById('cmpUpdated').textContent = 'Prices last updated ' + data.lastUpdated + '. Quick-commerce prices vary by location and may differ at checkout.';
       });
   })
   .catch(() => {
