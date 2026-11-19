@@ -58,7 +58,7 @@ function renderRetailer(r, bestPrice) {
     : `<div class="cmp-meta">Price not added yet</div>`;
   return `<a class="cmp-row${isBest ? ' is-best' : ''}" href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">
     <div class="cmp-logo" ${logoStyle}>${logo}</div>
-    <div><div class="cmp-store">${escapeHtml(r.name)}</div><div class="cmp-buy">Buy on ${escapeHtml(r.name)} →</div></div>
+    <div><div class="cmp-store">${escapeHtml(r.name)}</div>${r.note ? `<div class="cmp-meta">${escapeHtml(r.note)}</div>` : ''}<div class="cmp-buy">Buy on ${escapeHtml(r.name)} →</div></div>
     <div class="cmp-price">${price}</div>
   </a>`;
 }

@@ -11,27 +11,31 @@
           "color": "#e11d48",
           "price": 3999,
           "mrp": 4999,
+          "note": "Official site, seen 19 Nov 2026",
           "url": "https://www.muscleblaze.com/sv/muscleblaze-biozyme-performance-whey/SP-88093?navKey=VRNT-165145"
         },
         {
           "name": "Amazon",
           "color": "#f59e0b",
-          "price": null,
-          "mrp": null,
+          "price": 3899,
+          "mrp": 4999,
+          "note": "Amazon.in listing, seen 18 Nov 2026",
           "url": "https://www.amazon.in/s?k=muscleblaze+biozyme+performance+whey+rich+chocolate+1kg"
         },
         {
           "name": "HealthKart",
           "color": "#16a34a",
-          "price": null,
-          "mrp": null,
+          "price": 3749,
+          "mrp": 4999,
+          "note": "HealthKart 2.2 lb listing, seen 18 Nov 2026. Check the flavour before buying.",
           "url": "https://www.healthkart.com/search?q=muscleblaze+biozyme+performance+whey"
         },
         {
           "name": "Blinkit",
           "color": "#facc15",
-          "price": null,
-          "mrp": null,
+          "price": 3999,
+          "mrp": 4999,
+          "note": "Delhi listing, 7 Oct 2026 (Rozmo). Price varies by location; may be out of date.",
           "url": "https://blinkit.com/s/?q=muscleblaze%20biozyme%20whey"
         },
         {
@@ -44,8 +48,9 @@
         {
           "name": "Swiggy Instamart",
           "color": "#f97316",
-          "price": null,
-          "mrp": null,
+          "price": 3599,
+          "mrp": 4999,
+          "note": "Delhi listing, 7 Oct 2026 (Rozmo). Price varies by location; may be out of date.",
           "url": "https://www.swiggy.com/instamart/search?query=muscleblaze%20biozyme%20whey"
         }
       ]
