@@ -89,7 +89,9 @@ const inr = n => '₹' + Number(n).toLocaleString('en-IN');
 const STORES = [
   { name: 'Blinkit', color: '#facc15', search: q => `https://blinkit.com/s/?q=${encodeURIComponent(q)}` },
   { name: 'Zepto', color: '#7c3aed', logo: 'logos/zepto.svg', search: q => `https://www.zeptonow.com/search?query=${encodeURIComponent(q)}` },
-  { name: 'Swiggy Instamart', color: '#f97316', logo: 'logos/swiggy-instamart.svg', search: q => `https://www.swiggy.com/instamart/search?query=${encodeURIComponent(q)}` }
+  { name: 'Swiggy Instamart', color: '#f97316', logo: 'logos/swiggy-instamart.svg', search: q => `https://www.swiggy.com/instamart/search?query=${encodeURIComponent(q)}` },
+  { name: 'Amazon.in', color: '#f59e0b', logo: 'logos/amazon.ico', search: q => `https://www.amazon.in/s?k=${encodeURIComponent(q)}` },
+  { name: 'HealthKart', color: '#16a34a', logo: 'logos/healthkart.svg', search: q => `https://www.healthkart.com/search?q=${encodeURIComponent(q)}` }
 ];
 const input = document.getElementById('cmpQ');
 const box = document.getElementById('cmpSuggest');
