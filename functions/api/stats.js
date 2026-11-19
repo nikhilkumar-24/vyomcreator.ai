@@ -1,5 +1,5 @@
 const CACHE_SECONDS = 3600;
-const START_DATE = '2024-01-01T00:00:00Z';
+const RETENTION_DAYS = 180;
 const CHUNK_DAYS = 90;
 const WORKER_CHUNK_DAYS = 28;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -12,6 +12,7 @@ const WORKER_QUERY = `query ($accountTag: string!, $since: Time!, $until: Time!)
         filter: { datetime_geq: $since, datetime_leq: $until }
       ) {
         sum { requests }
+        dimensions { coloCode }
       }
     }
   }
@@ -61,9 +62,16 @@ export async function onRequestGet({ request, env }) {
   const countries = [...totals].map(([code, visits]) => ({ code, visits })).sort((a, b) => b.visits - a.visits);
   const visits = countries.reduce((total, c) => total + c.visits, 0);
   const invocations = workerResults.flat().reduce((total, g) => total + (Number(g.sum?.requests) || 0), 0);
+  const coloTotals = new Map();
+  for (const g of workerResults.flat()) {
+    const code = g.dimensions?.coloCode;
+    const requests = Number(g.sum?.requests) || 0;
+    if (code && requests > 0) coloTotals.set(code, (coloTotals.get(code) || 0) + requests);
+  }
+  const colos = [...coloTotals].map(([code, requests]) => ({ code, requests })).sort((a, b) => b.requests - a.requests);
 
   const response = Response.json(
-    { visits, invocations, scope: 'all-time', countries },
+    { visits, invocations, scope: 'last-180-days', countries, colos },
     { headers: { 'Cache-Control': `public, max-age=${CACHE_SECONDS}` } },
   );
   await cache.put(cacheKey, response.clone());
@@ -71,7 +79,7 @@ export async function onRequestGet({ request, env }) {
 }
 
 function windowsFor(days) {
-  const floor = new Date(START_DATE).getTime();
+  const floor = Date.now() - RETENTION_DAYS * DAY_MS;
   const windows = [];
   for (let end = Date.now(); end > floor; end -= days * DAY_MS) {
     windows.push({

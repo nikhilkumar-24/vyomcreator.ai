@@ -27,7 +27,7 @@
 <main>
 <section class="lp-reach-band" id="reach" hidden>
   <p class="lp-eyebrow">Where creators use VYOM</p>
-  <h2>Creators in <span id="reach-count">—</span> countries</h2>
+  <h2>Requests served from <span id="reach-count">—</span> Cloudflare locations</h2>
   <div id="globe" class="lp-globe" role="img" aria-label="Globe showing the countries where VYOM is used"></div>
   <ul id="reach-list" class="lp-reach-list"></ul>
   <p class="lp-reach-more" id="reach-more"></p>
@@ -178,34 +178,42 @@
 
 <script src="chat-widget.js" defer></script>
 <script>
-  const CENTROIDS = {
-    AE: [23.4, 53.8], AU: [-25.3, 133.8], BD: [23.7, 90.4], BR: [-14.2, -51.9], CA: [56.1, -106.3],
-    CN: [35.9, 104.2], DE: [51.2, 10.5], ES: [40.5, -3.7], FR: [46.2, 2.2], GB: [55.4, -3.4],
-    ID: [-0.8, 113.9], IE: [53.4, -8.2], IN: [20.6, 78.9], IT: [41.9, 12.6], JP: [36.2, 138.3],
-    KE: [-0.02, 37.9], KR: [35.9, 127.8], KW: [29.3, 47.5], LK: [7.9, 80.8], MX: [23.6, -102.6],
-    MY: [4.2, 101.98], NG: [9.1, 8.7], NL: [52.1, 5.3], NP: [28.4, 84.1], NZ: [-40.9, 174.9],
-    OM: [21.0, 57.0], PH: [12.9, 121.8], PK: [30.4, 69.3], QA: [25.4, 51.2], RU: [61.5, 105.3],
-    SA: [23.9, 45.1], SE: [60.1, 18.6], SG: [1.35, 103.8], TH: [15.9, 100.99], US: [39.8, -98.6],
-    VN: [14.1, 108.3], ZA: [-30.6, 22.9]
+  const COLOS = {
+    SIN: [1.36, 103.99, 'Singapore', 'SG'], ZRH: [47.46, 8.55, 'Zurich', 'CH'], MAA: [12.99, 80.17, 'Chennai', 'IN'],
+    FRA: [50.03, 8.57, 'Frankfurt-am-Main', 'DE'], EWR: [40.69, -74.17, 'Newark', 'US'], YYZ: [43.68, -79.63, 'Toronto', 'CA'],
+    DFW: [32.9, -97.04, 'Dallas-Fort Worth', 'US'], CMH: [40.0, -82.89, 'Columbus', 'US'], SJC: [37.36, -121.93, 'San Jose', 'US'],
+    CDG: [49.01, 2.55, 'Paris', 'FR'], LAX: [33.94, -118.41, 'Los Angeles', 'US'], IAD: [38.95, -77.46, 'Dulles', 'US'],
+    ATL: [33.64, -84.43, 'Atlanta', 'US'], MXP: [45.63, 8.72, 'Milan', 'IT'], MIA: [25.79, -80.29, 'Miami', 'US'],
+    ORD: [41.98, -87.9, 'Chicago', 'US'], MUC: [48.35, 11.79, 'Munich', 'DE'], GRU: [-23.43, -46.47, 'Sao Paulo', 'BR'],
+    MRS: [43.44, 5.22, 'Marseille', 'FR'], HKG: [22.31, 113.91, 'Hong Kong', 'HK'], ICN: [37.46, 126.44, 'Seoul', 'KR'],
+    PDX: [45.59, -122.6, 'Portland', 'US'], NRT: [35.77, 140.39, 'Tokyo', 'JP'], MAN: [53.35, -2.27, 'Manchester', 'GB'],
+    AMS: [52.31, 4.76, 'Amsterdam', 'NL'], BOS: [42.36, -71.01, 'Boston', 'US'], SEA: [47.45, -122.31, 'Seattle', 'US'],
+    YVR: [49.19, -123.18, 'Vancouver', 'CA'], EZE: [-34.82, -58.54, 'Ezeiza', 'AR'], BOM: [19.09, 72.87, 'Mumbai', 'IN'],
+    HYD: [17.24, 78.43, 'Hyderabad', 'IN'], DAC: [23.84, 90.4, 'Dhaka', 'BD'], BKK: [13.69, 100.75, 'Bangkok', 'TH'],
+    GYD: [40.47, 50.05, 'Baku', 'AZ'], CPH: [55.62, 12.66, 'Copenhagen', 'DK'], GIG: [-22.81, -43.25, 'Rio De Janeiro', 'BR'],
+    MSP: [44.88, -93.22, 'Minneapolis', 'US'], PHX: [33.43, -112.01, 'Phoenix', 'US'], ARN: [59.65, 17.92, 'Stockholm', 'SE'],
+    MCI: [39.3, -94.71, 'Kansas City', 'US'], DUB: [53.42, -6.27, 'Dublin', 'IE'], WAW: [52.17, 20.97, 'Warsaw', 'PL']
   };
-  const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
 
-  function renderReach(countries) {
+  function renderReach(colos) {
     const section = document.getElementById('reach');
-    const points = countries
-      .filter((c) => CENTROIDS[c.code])
-      .map((c) => ({ lat: CENTROIDS[c.code][0], lng: CENTROIDS[c.code][1], visits: c.visits, name: regionNames.of(c.code) || c.code }));
-    if (!countries.length) return;
+    const points = colos
+      .filter((c) => COLOS[c.code])
+      .map((c) => ({ lat: COLOS[c.code][0], lng: COLOS[c.code][1], requests: c.requests, name: `${COLOS[c.code][2]}, ${COLOS[c.code][3]} (${c.code})` }));
+    if (!colos.length) return;
 
     section.hidden = false;
-    document.getElementById('reach-count').textContent = countries.length;
-    const list = document.getElementById('reach-list');
-    list.innerHTML = countries
-      .map((c) => `<li><span>${regionNames.of(c.code) || c.code}</span><strong>${c.visits.toLocaleString('en-IN')}</strong></li>`)
+    document.getElementById('reach-count').textContent = colos.length;
+    document.getElementById('reach-list').innerHTML = colos
+      .map((c) => {
+        const info = COLOS[c.code];
+        const label = info ? `${info[2]}, ${info[3]} (${c.code})` : c.code;
+        return `<li><span>${label}</span><strong>${c.requests.toLocaleString('en-IN')}</strong></li>`;
+      })
       .join('');
     document.getElementById('reach-more').textContent = '';
 
-    const maxVisits = Math.max(...points.map((p) => p.visits), 1);
+    const maxRequests = Math.max(...points.map((p) => p.requests), 1);
     const container = document.getElementById('globe');
     const globe = Globe()(container)
       .width(container.clientWidth)
@@ -217,21 +225,21 @@
       .pointLat('lat')
       .pointLng('lng')
       .pointColor(() => '#fafafa')
-      .pointAltitude((d) => 0.02 + (d.visits / maxVisits) * 0.15)
-      .pointRadius((d) => 0.3 + (d.visits / maxVisits) * 0.6)
-      .pointLabel((d) => `${d.name}: ${d.visits.toLocaleString('en-IN')} visits`);
+      .pointAltitude((d) => 0.02 + (d.requests / maxRequests) * 0.15)
+      .pointRadius((d) => 0.3 + (d.requests / maxRequests) * 0.6)
+      .pointLabel((d) => `${d.name}: ${d.requests.toLocaleString('en-IN')} requests`);
     globe.controls().autoRotate = true;
     globe.controls().autoRotateSpeed = 0.6;
-    const leader = points.reduce((a, b) => (b.visits > a.visits ? b : a), points[0]);
+    const leader = points.reduce((a, b) => (b.requests > a.requests ? b : a), points[0]);
     if (leader) globe.pointOfView({ lat: leader.lat, lng: leader.lng, altitude: 2 }, 0);
     window.addEventListener('resize', () => globe.width(container.clientWidth));
   }
 
   fetch('/api/stats').then(r => r.ok ? r.json() : null).then(d => {
     if (!d || !Number.isFinite(d.visits)) return;
-    document.getElementById('visit-count').textContent = d.visits.toLocaleString('en-IN') + ' visits · ' + (d.invocations ?? 0).toLocaleString('en-IN') + ' Worker invocations · all time';
-    if (Array.isArray(d.countries) && d.countries.length) {
-      loadScript('https://unpkg.com/globe.gl@2.46.2/dist/globe.gl.min.js').then(() => renderReach(d.countries)).catch(() => {});
+    document.getElementById('visit-count').textContent = d.visits.toLocaleString('en-IN') + ' visits · ' + (d.invocations ?? 0).toLocaleString('en-IN') + ' Worker invocations · last 6 months';
+    if (Array.isArray(d.colos) && d.colos.length) {
+      loadScript('https://unpkg.com/globe.gl@2.46.2/dist/globe.gl.min.js').then(() => renderReach(d.colos)).catch(() => {});
     }
   }).catch(() => {});
 
