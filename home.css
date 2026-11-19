@@ -418,7 +418,7 @@ body.landing .lp-btn-outline { border-color: #3f3f46; color: #fafafa; background
   font-size: 13px;
   color: #52525b;
 }
-@media (min-width: 768px) { .lp-footer-inner { grid-template-columns: 2fr 1fr 1fr; } }
+@media (min-width: 768px) { .lp-footer-inner { grid-template-columns: 2fr 1fr 1fr 1.5fr; } }
 
 /* Entrance animation (skipped for reduced motion) */
 @media (prefers-reduced-motion: no-preference) {
