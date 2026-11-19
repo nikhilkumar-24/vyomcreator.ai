@@ -1,5 +1,6 @@
 const CACHE_SECONDS = 3600;
-const RETENTION_DAYS = 180;
+const RUM_RETENTION_DAYS = 180;
+const WORKER_RETENTION_DAYS = 89;
 const CHUNK_DAYS = 90;
 const WORKER_CHUNK_DAYS = 28;
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -44,8 +45,8 @@ export async function onRequestGet({ request, env }) {
   }
 
   const [visitResults, workerResults] = await Promise.all([
-    Promise.all(windowsFor(CHUNK_DAYS).map((w) => fetchWindow(env, QUERY, 'rumPageloadEventsAdaptiveGroups', w))),
-    Promise.all(windowsFor(WORKER_CHUNK_DAYS).map((w) => fetchWindow(env, WORKER_QUERY, 'workersInvocationsAdaptive', w))),
+    Promise.all(windowsFor(CHUNK_DAYS, RUM_RETENTION_DAYS).map((w) => fetchWindow(env, QUERY, 'rumPageloadEventsAdaptiveGroups', w))),
+    Promise.all(windowsFor(WORKER_CHUNK_DAYS, WORKER_RETENTION_DAYS).map((w) => fetchWindow(env, WORKER_QUERY, 'workersInvocationsAdaptive', w))),
   ]);
   if (visitResults.includes(null) || workerResults.includes(null)) {
     return Response.json({ visits: null }, { status: 502 });
@@ -78,8 +79,8 @@ export async function onRequestGet({ request, env }) {
   return response;
 }
 
-function windowsFor(days) {
-  const floor = Date.now() - RETENTION_DAYS * DAY_MS;
+function windowsFor(days, retentionDays) {
+  const floor = Date.now() - retentionDays * DAY_MS;
   const windows = [];
   for (let end = Date.now(); end > floor; end -= days * DAY_MS) {
     windows.push({
