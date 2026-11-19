@@ -252,6 +252,7 @@
       .pointLabel((d) => `${d.name}: ${d.requests.toLocaleString('en-IN')} requests`);
     globe.controls().autoRotate = true;
     globe.controls().autoRotateSpeed = 0.6;
+    globe.controls().enableZoom = false;
     const leader = points.reduce((a, b) => (b.requests > a.requests ? b : a), points[0]);
     if (leader) globe.pointOfView({ lat: leader.lat, lng: leader.lng, altitude: 2 }, 0);
     window.addEventListener('resize', () => globe.width(container.clientWidth));
