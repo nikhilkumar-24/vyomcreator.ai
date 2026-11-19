@@ -142,6 +142,16 @@
   </div>
 </section>
 
+<section class="lp-section" id="reach" hidden>
+  <div class="lp-wrap lp-reach">
+    <p class="lp-eyebrow">Where creators use VYOM</p>
+    <h2>Creators in <span id="reach-count">—</span> countries</h2>
+    <p class="lp-reach-sub">Visits from the last 90 days. Drag the globe to explore.</p>
+    <div id="globe" class="lp-globe" role="img" aria-label="Globe showing the countries where VYOM is used"></div>
+    <ul id="reach-list" class="lp-reach-list"></ul>
+  </div>
+</section>
+
 <section class="lp-section" style="padding-top:0">
   <div class="lp-wrap"><p class="lp-note">Scores are directional content-readiness estimates, not predicted views. Instagram ranking, audience response and distribution can change outcomes.</p></div>
 </section>
@@ -171,9 +181,69 @@
 
 <script src="chat-widget.js" defer></script>
 <script>
+  const CENTROIDS = {
+    AE: [23.4, 53.8], AU: [-25.3, 133.8], BD: [23.7, 90.4], BR: [-14.2, -51.9], CA: [56.1, -106.3],
+    CN: [35.9, 104.2], DE: [51.2, 10.5], ES: [40.5, -3.7], FR: [46.2, 2.2], GB: [55.4, -3.4],
+    ID: [-0.8, 113.9], IE: [53.4, -8.2], IN: [20.6, 78.9], IT: [41.9, 12.6], JP: [36.2, 138.3],
+    KE: [-0.02, 37.9], KR: [35.9, 127.8], KW: [29.3, 47.5], LK: [7.9, 80.8], MX: [23.6, -102.6],
+    MY: [4.2, 101.98], NG: [9.1, 8.7], NL: [52.1, 5.3], NP: [28.4, 84.1], NZ: [-40.9, 174.9],
+    OM: [21.0, 57.0], PH: [12.9, 121.8], PK: [30.4, 69.3], QA: [25.4, 51.2], RU: [61.5, 105.3],
+    SA: [23.9, 45.1], SE: [60.1, 18.6], SG: [1.35, 103.8], TH: [15.9, 100.99], US: [39.8, -98.6],
+    VN: [14.1, 108.3], ZA: [-30.6, 22.9]
+  };
+  const regionNames = new Intl.DisplayNames(['en'], { type: 'region' });
+
+  function renderReach(countries) {
+    const section = document.getElementById('reach');
+    const points = countries
+      .filter((c) => CENTROIDS[c.code])
+      .map((c) => ({ lat: CENTROIDS[c.code][0], lng: CENTROIDS[c.code][1], visits: c.visits, name: regionNames.of(c.code) || c.code }));
+    if (!countries.length) return;
+
+    section.hidden = false;
+    document.getElementById('reach-count').textContent = countries.length;
+    document.getElementById('reach-list').innerHTML = countries
+      .map((c) => `<li><span>${regionNames.of(c.code) || c.code}</span><strong>${c.visits.toLocaleString('en-IN')}</strong></li>`)
+      .join('');
+
+    const maxVisits = Math.max(...points.map((p) => p.visits), 1);
+    const container = document.getElementById('globe');
+    const globe = Globe()(container)
+      .width(container.clientWidth)
+      .height(420)
+      .backgroundColor('rgba(0,0,0,0)')
+      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
+      .atmosphereColor('#a78bfa')
+      .pointsData(points)
+      .pointLat('lat')
+      .pointLng('lng')
+      .pointColor(() => '#fafafa')
+      .pointAltitude((d) => 0.02 + (d.visits / maxVisits) * 0.15)
+      .pointRadius((d) => 0.3 + (d.visits / maxVisits) * 0.6)
+      .pointLabel((d) => `${d.name}: ${d.visits.toLocaleString('en-IN')} visits`);
+    globe.controls().autoRotate = true;
+    globe.controls().autoRotateSpeed = 0.6;
+    const top = points.reduce((a, b) => (b.visits > a.visits ? b : a), points[0]);
+    if (top) globe.pointOfView({ lat: top.lat, lng: top.lng, altitude: 2 }, 0);
+    window.addEventListener('resize', () => globe.width(container.clientWidth));
+  }
+
   fetch('/api/stats').then(r => r.ok ? r.json() : null).then(d => {
     if (!d || !Number.isFinite(d.visits)) return;
-    document.getElementById('visit-count').textContent = d.visits.toLocaleString('en-IN') + ' visits';
+    document.getElementById('visit-count').textContent = d.visits.toLocaleString('en-IN') + ' visits · last ' + d.days + ' days';
+    if (Array.isArray(d.countries) && d.countries.length) {
+      loadScript('https://unpkg.com/globe.gl@2.46.2/dist/globe.gl.min.js').then(() => renderReach(d.countries)).catch(() => {});
+    }
   }).catch(() => {});
+
+  function loadScript(src) {
+    return new Promise((resolve, reject) => {
+      const el = document.createElement('script');
+      el.src = src;
+      el.onload = resolve;
+      el.onerror = reject;
+      document.head.appendChild(el);
+    });
+  }
 </script></body>
 </html>

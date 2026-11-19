@@ -1,11 +1,16 @@
 const CACHE_SECONDS = 3600;
-const SINCE = '2024-01-01T00:00:00Z';
+const WINDOW_DAYS = 90;
 
 const QUERY = `query ($accountTag: string!, $since: Time!, $until: Time!) {
   viewer {
     accounts(filter: { accountTag: $accountTag }) {
-      rumPageloadEventsAdaptiveGroups(limit: 1, filter: { datetime_geq: $since, datetime_leq: $until }) {
+      rumPageloadEventsAdaptiveGroups(
+        limit: 300
+        orderBy: [sum_visits_DESC]
+        filter: { datetime_geq: $since, datetime_leq: $until }
+      ) {
         sum { visits }
+        dimensions { countryName }
       }
     }
   }
@@ -21,7 +26,8 @@ export async function onRequestGet({ request, env }) {
     return Response.json({ visits: null }, { status: 503 });
   }
 
-  const until = new Date().toISOString();
+  const until = new Date();
+  const since = new Date(until.getTime() - WINDOW_DAYS * 24 * 60 * 60 * 1000);
   const res = await fetch('https://api.cloudflare.com/client/v4/graphql', {
     method: 'POST',
     headers: {
@@ -30,7 +36,11 @@ export async function onRequestGet({ request, env }) {
     },
     body: JSON.stringify({
       query: QUERY,
-      variables: { accountTag: env.CF_ACCOUNT_ID, since: SINCE, until },
+      variables: {
+        accountTag: env.CF_ACCOUNT_ID,
+        since: since.toISOString(),
+        until: until.toISOString(),
+      },
     }),
   });
 
@@ -40,13 +50,17 @@ export async function onRequestGet({ request, env }) {
 
   const body = await res.json();
   const groups = body?.data?.viewer?.accounts?.[0]?.rumPageloadEventsAdaptiveGroups;
-  const visits = groups?.[0]?.sum?.visits;
-  if (!Number.isFinite(visits)) {
+  if (!Array.isArray(groups)) {
     return Response.json({ visits: null }, { status: 502 });
   }
 
+  const countries = groups
+    .map((g) => ({ code: g.dimensions?.countryName, visits: Number(g.sum?.visits) || 0 }))
+    .filter((c) => c.code && c.visits > 0);
+  const visits = countries.reduce((total, c) => total + c.visits, 0);
+
   const response = Response.json(
-    { visits, since: SINCE },
+    { visits, days: WINDOW_DAYS, countries },
     { headers: { 'Cache-Control': `public, max-age=${CACHE_SECONDS}` } },
   );
   await cache.put(cacheKey, response.clone());
