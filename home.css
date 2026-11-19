@@ -184,12 +184,12 @@ body.landing .lp-btn-outline { border-color: #3f3f46; color: #fafafa; background
 .lp-hero h1 .lp-muted { color: #71717a; }
 .lp-lede {
   max-width: 672px;
-  margin: 0 auto 40px;
+  margin: 0 auto 56px;
   font-size: 18px;
   line-height: 1.625;
   color: #a1a1aa;
 }
-.lp-ctas { display: flex; flex-direction: column; gap: 16px; justify-content: center; margin-bottom: 48px; }
+.lp-ctas { display: flex; flex-direction: column; gap: 20px; justify-content: center; margin-bottom: 56px; }
 
 @media (min-width: 480px) { .lp-hero h1 { font-size: 48px; } }
 @media (min-width: 640px) { .lp-ctas { flex-direction: row; } }
