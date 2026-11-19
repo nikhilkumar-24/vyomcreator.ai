@@ -30,6 +30,8 @@
   <h2>Worker requests by region</h2>
   <div id="globe" class="lp-globe" role="img" aria-label="Globe showing the regions where VYOM is used"></div>
   <ul id="reach-list" class="lp-reach-list"><li><span>Loading region data…</span></li></ul>
+  <p class="lp-eyebrow lp-reach-sub">Visitors by country</p>
+  <ul id="country-list" class="lp-reach-list"></ul>
   <p class="lp-reach-more" id="reach-more"></p>
 </section>
 <section class="lp-hero">
@@ -217,7 +219,7 @@
       const region = (info && REGION_OF[info[3]]) || 'Other';
       const r = regions.get(region) || { requests: 0, cities: [] };
       r.requests += c.requests;
-      if (info) r.cities.push(info[2]);
+      if (info) r.cities.push(`${info[2]} ${c.requests.toLocaleString('en-IN')}`);
       regions.set(region, r);
     }
     const total = colos.reduce((sum, c) => sum + c.requests, 0) || 1;
@@ -225,7 +227,7 @@
       .sort((a, b) => b[1].requests - a[1].requests)
       .map(([name, r]) => {
         const share = Math.round((r.requests / total) * 100);
-        const top = r.cities.slice(0, 3).join(', ');
+        const top = r.cities.join(' · ');
         return `<li><span>${name} · ${share}%<small>${top}</small></span><strong>${r.requests.toLocaleString('en-IN')}</strong></li>`;
       });
 
@@ -254,9 +256,17 @@
     window.addEventListener('resize', () => globe.width(container.clientWidth));
   }
 
+  function renderCountries(countries) {
+    const names = new Intl.DisplayNames(['en'], { type: 'region' });
+    document.getElementById('country-list').innerHTML = countries
+      .map((c) => `<li><span>${names.of(c.code) || c.code}</span><strong>${c.visits.toLocaleString('en-IN')}</strong></li>`)
+      .join('');
+  }
+
   fetch('/api/stats').then(r => r.ok ? r.json() : null).then(d => {
     if (!d || !Number.isFinite(d.visits)) return renderReach([]);
     document.getElementById('visit-count').textContent = d.visits.toLocaleString('en-IN') + ' visits · ' + (d.invocations ?? 0).toLocaleString('en-IN') + ' Worker invocations · last 6 months';
+    renderCountries(d.countries || []);
     if (Array.isArray(d.colos) && d.colos.length) {
       loadScript('https://unpkg.com/globe.gl@2.46.2/dist/globe.gl.min.js').then(() => renderReach(d.colos)).catch(() => {});
     } else {

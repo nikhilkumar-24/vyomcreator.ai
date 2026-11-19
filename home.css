@@ -381,6 +381,7 @@ body.landing .lp-reach-band h2 { margin: 4px 0 0; font-size: clamp(22px, 3vw, 30
 .lp-reach-list li > span { display: flex; flex-direction: column; gap: 2px; }
 .lp-reach-list li small { color: #71717a; font-size: 12px; }
 body.landing .lp-reach-more { margin: 8px 0 0; color: #71717a; font-size: 13px; }
+body.landing .lp-reach-sub { margin: 32px 0 12px; }
 .lp-reach-band:not([hidden]) + .lp-hero { min-height: 0; padding-top: 32px; padding-bottom: 48px; }
 
 .lp-lang { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid #27272a; border-radius: 12px; background: #111111; }

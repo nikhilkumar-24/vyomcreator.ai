@@ -35,7 +35,7 @@ const QUERY = `query ($accountTag: string!, $since: Time!, $until: Time!) {
 
 export async function onRequestGet({ request, env }) {
   const cache = caches.default;
-  const cacheKey = new Request(new URL(request.url).origin + '/api/stats');
+  const cacheKey = new Request(new URL(request.url).origin + '/api/stats-v2');
   const cached = await cache.match(cacheKey);
   if (cached) return cached;
 
