@@ -77,7 +77,7 @@
     <div class="cmp-product-name" id="cmpName"></div>
     <div class="cmp-product-sub" id="cmpVariant"></div>
   </div>
-  <div class="cmp-toolbar"><span class="cmp-status" id="cmpStatus"></span><span class="cmp-status" id="cmpArea"></span></div>
+  <div class="cmp-toolbar"><span class="cmp-status" id="cmpStatus"></span></div>
   <div class="cmp-list" id="cmpList"></div>
   <div class="cmp-footnote">Quick-commerce prices depend on your delivery location, so they are not shown here. Each row opens that store's search for the same product.</div>
 </section>
@@ -87,9 +87,9 @@
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const inr = n => '₹' + Number(n).toLocaleString('en-IN');
 const STORES = [
-  { name: 'Blinkit', color: '#facc15', hint: 'Allow location on Blinkit when it asks to see prices near you.', search: q => `https://blinkit.com/s/?q=${encodeURIComponent(q)}` },
+  { name: 'Blinkit', color: '#facc15', search: q => `https://blinkit.com/s/?q=${encodeURIComponent(q)}` },
   { name: 'Zepto', color: '#7c3aed', logo: 'logos/zepto.svg', search: q => `https://www.zeptonow.com/search?query=${encodeURIComponent(q)}` },
-  { name: 'Swiggy Instamart', color: '#f97316', logo: 'logos/swiggy-instamart.svg', hint: 'Allow location on Instamart when it asks to see prices near you.', search: q => `https://www.swiggy.com/instamart/search?query=${encodeURIComponent(q)}` }
+  { name: 'Swiggy Instamart', color: '#f97316', logo: 'logos/swiggy-instamart.svg', search: q => `https://www.swiggy.com/instamart/search?query=${encodeURIComponent(q)}` }
 ];
 const input = document.getElementById('cmpQ');
 const box = document.getElementById('cmpSuggest');
@@ -130,7 +130,7 @@ function renderBoard(s) {
   }, ...STORES.map(st => ({
     name: st.name, logo: st.logo, color: st.color, price: null, mrp: null,
     url: st.search(q), cta: 'Search on ' + st.name + ' →',
-    note: st.hint || ('Opens search for "' + q + '". Price depends on your location.')
+    note: 'Opens search for "' + q + '" on ' + st.name + '.'
   }))];
   document.getElementById('cmpList').innerHTML = rows.map(rowHtml).join('');
   document.getElementById('cmpStatus').textContent = s.inStock === false
@@ -149,36 +149,6 @@ function showSuggestions() {
   input.setAttribute('aria-expanded', 'true');
 }
 
-let areaCache = null;
-
-function detectArea() {
-  if (areaCache) return Promise.resolve(areaCache);
-  return new Promise(resolve => {
-    if (!navigator.geolocation) return resolve(null);
-    navigator.geolocation.getCurrentPosition(pos => {
-      const { latitude: lat, longitude: lon } = pos.coords;
-      fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=14&lat=${lat}&lon=${lon}`, { headers: { Accept: 'application/json' } })
-        .then(r => (r.ok ? r.json() : null))
-        .then(d => {
-          const a = (d && d.address) || {};
-          areaCache = [a.suburb || a.neighbourhood || a.city_district, a.city || a.town || a.county, a.postcode].filter(Boolean).join(', ') || null;
-          resolve(areaCache);
-        })
-        .catch(() => resolve(null));
-    }, () => resolve(null), { timeout: 8000, maximumAge: 600000 });
-  });
-}
-
-function showArea() {
-  const el = document.getElementById('cmpArea');
-  el.textContent = 'Checking your location…';
-  detectArea().then(area => {
-    el.textContent = area
-      ? 'Your location: ' + area + '. Open a store to see its prices for this area.'
-      : 'Allow location to match store prices to your area. Each store uses the location saved in your browser.';
-  });
-}
-
 function choose(i) {
   const s = suggestions[i];
   if (!s) return;
@@ -186,7 +156,6 @@ function choose(i) {
   box.hidden = true;
   input.setAttribute('aria-expanded', 'false');
   renderBoard(s);
-  showArea();
 }
 
 async function search(q) {
