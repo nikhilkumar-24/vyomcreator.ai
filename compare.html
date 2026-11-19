@@ -156,6 +156,7 @@ function renderBoard(s) {
       note: hk.inStock === false ? 'Out of stock' : 'Official site · Live price'
     };
     return {
+      name: st.name, logo: st.logo, color: st.color, price: null, mrp: null,
       url: st.search(q), cta: 'Search on ' + st.name + ' →', note: 'Opens search for "' + q + '" on ' + st.name + '.'
     };
   })];
