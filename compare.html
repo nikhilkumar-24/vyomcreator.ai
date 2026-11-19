@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0a0a0a">
+<title>Compare Supplement Prices | vyom.ai</title>
+<meta name="description" content="Compare prices for the same supplement across MuscleBlaze, Amazon, HealthKart, Blinkit, Zepto and Swiggy Instamart before you buy.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.vyomcreator.ai/compare">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="vyom.ai">
+<meta property="og:title" content="Compare Supplement Prices | vyom.ai">
+<meta property="og:description" content="See where the same supplement is cheapest before you buy.">
+<meta property="og:url" content="https://www.vyomcreator.ai/compare">
+<meta property="og:image" content="https://www.vyomcreator.ai/vyom-main.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="app.css">
+<style>
+.cmp-product { margin-top: 8px; }
+.cmp-product-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+.cmp-product-head h3 { margin: 0; font-size: 18px; }
+.cmp-variant { color: var(--muted); font-size: 13px; }
+.cmp-list { display: grid; gap: 10px; }
+.cmp-row { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 12px; background: rgba(255,255,255,.02); text-decoration: none; color: inherit; transition: border-color .2s, background .2s; }
+.cmp-row:hover { border-color: #3f3f46; background: rgba(255,255,255,.04); }
+.cmp-row.is-best { border-color: #16a34a; }
+.cmp-logo { width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center; color: #0a0a0a; font-weight: 700; font-size: 13px; letter-spacing: .02em; overflow: hidden; }
+.cmp-logo img { width: 100%; height: 100%; object-fit: contain; background: #fff; }
+.cmp-store { font-weight: 600; font-size: 15px; }
+.cmp-meta { font-size: 12px; color: var(--muted); margin-top: 2px; }
+.cmp-price { text-align: right; }
+.cmp-amount { font-size: 18px; font-weight: 700; }
+.cmp-mrp { font-size: 12px; color: var(--subtle); text-decoration: line-through; margin-left: 6px; }
+.cmp-best { display: inline-block; font-size: 11px; font-weight: 600; color: #16a34a; margin-top: 2px; }
+.cmp-buy { display: inline-block; margin-top: 4px; font-size: 13px; color: var(--muted); }
+.cmp-row:hover .cmp-buy { color: #fafafa; }
+.cmp-note { margin-top: 18px; font-size: 12px; color: var(--subtle); }
+@media (max-width: 480px) { .cmp-row { grid-template-columns: auto 1fr; } .cmp-price { grid-column: 2; text-align: left; } }
+</style>
+</head>
+<body><main class="wrap">
+<header class="nav"><nav class="nav-links nav-left"><a href="/" class="navlink">Home</a><a href="/hooks" class="navlink">Hooks</a></nav><div class="brand"><a href="/" class="vyom-logo" aria-label="VYOM Creator AI home"><span class="vyom-logo-word">VYOM<i class="vyom-logo-star">✦</i></span><span class="vyom-logo-sub">Creator AI</span></a></div><div class="nav-end"><nav class="nav-links"><a href="/sfx" class="navlink">SFX</a><a href="/beatline" class="navlink">Beatline</a><a href="/captions" class="navlink">Captions</a><a href="/compare" class="navlink active">Compare</a></nav><div class="pill">✦ CREATOR GROWTH LAB · BETA</div></div></header>
+<section class="hero"><div><div class="eyebrow">Price comparison</div><h1>Compare <span class="grad">before you buy.</span></h1><p>See the same supplement across stores, sorted by price. Tap a store to buy it there.</p></div></section>
+<section class="panel"><h2>Prices</h2><p class="sub" id="cmpStatus">Loading prices…</p><div id="cmpProducts"></div></section>
+<footer class="footer">VYOM.AI · Built for creators · <span id="cmpUpdated"></span></footer>
+</main>
+<script>
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+const inr = n => '₹' + Number(n).toLocaleString('en-IN');
+
+function renderRetailer(r, bestPrice) {
+  const hasPrice = typeof r.price === 'number';
+  const isBest = hasPrice && r.price === bestPrice;
+  const logo = r.logo
+    ? `<img src="${escapeHtml(r.logo)}" alt="${escapeHtml(r.name)} logo">`
+    : escapeHtml(r.name.split(' ').map(w => w[0]).join('').slice(0, 3).toUpperCase());
+  const logoStyle = r.logo ? '' : `style="background:${escapeHtml(r.color || '#71717a')}"`;
+  const price = hasPrice
+    ? `<div class="cmp-amount">${inr(r.price)}${r.mrp ? `<span class="cmp-mrp">${inr(r.mrp)}</span>` : ''}</div>${isBest ? '<div class="cmp-best">Lowest price</div>' : ''}`
+    : `<div class="cmp-meta">Price not added yet</div>`;
+  return `<a class="cmp-row${isBest ? ' is-best' : ''}" href="${escapeHtml(r.url)}" target="_blank" rel="noopener noreferrer">
+    <div class="cmp-logo" ${logoStyle}>${logo}</div>
+    <div><div class="cmp-store">${escapeHtml(r.name)}</div><div class="cmp-buy">Buy on ${escapeHtml(r.name)} →</div></div>
+    <div class="cmp-price">${price}</div>
+  </a>`;
+}
+
+function renderProduct(p) {
+  const priced = p.retailers.filter(r => typeof r.price === 'number').sort((a, b) => a.price - b.price);
+  const unpriced = p.retailers.filter(r => typeof r.price !== 'number');
+  const bestPrice = priced.length ? priced[0].price : null;
+  return `<article class="cmp-product">
+    <div class="cmp-product-head"><h3>${escapeHtml(p.name)}</h3><span class="cmp-variant">${escapeHtml(p.variant || '')}</span></div>
+    <div class="cmp-list">${[...priced, ...unpriced].map(r => renderRetailer(r, bestPrice)).join('')}</div>
+  </article>`;
+}
+
+fetch('compare-prices.json', { cache: 'no-cache' })
+  .then(res => { if (!res.ok) throw new Error('HTTP ' + res.status); return res.json(); })
+  .then(data => {
+    return fetch('/api/price/muscleblaze')
+      .then(res => (res.ok ? res.json() : null))
+      .catch(() => null)
+      .then(live => {
+        if (live && live.ok) {
+          data.products.forEach(p => p.retailers.forEach(r => {
+            if (r.name === 'MuscleBlaze') r.price = live.price;
+          }));
+        }
+        document.getElementById('cmpProducts').innerHTML = data.products.map(renderProduct).join('');
+        const liveNote = live && live.ok ? ' MuscleBlaze price checked live.' : ' Live MuscleBlaze price unavailable, showing last saved price.';
+        document.getElementById('cmpStatus').textContent = 'Prices may differ from checkout. Quick-commerce prices vary by location.' + liveNote;
+        document.getElementById('cmpUpdated').textContent = 'Prices last updated ' + data.lastUpdated;
+      });
+  })
+  .catch(() => {
+    document.getElementById('cmpStatus').textContent = 'Could not load prices. Please try again later.';
+  });
+</script>
+</body>
+</html>

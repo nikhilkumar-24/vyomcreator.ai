@@ -1,0 +1,54 @@
+{
+  "lastUpdated": "2026-11-19",
+  "products": [
+    {
+      "id": "muscleblaze-biozyme-whey-rich-chocolate-1kg",
+      "name": "MuscleBlaze Biozyme Performance Whey",
+      "variant": "Rich Chocolate · 1 kg",
+      "retailers": [
+        {
+          "name": "MuscleBlaze",
+          "color": "#e11d48",
+          "price": 3999,
+          "mrp": 4999,
+          "url": "https://www.muscleblaze.com/sv/muscleblaze-biozyme-performance-whey/SP-88093?navKey=VRNT-165145"
+        },
+        {
+          "name": "Amazon",
+          "color": "#f59e0b",
+          "price": null,
+          "mrp": null,
+          "url": "https://www.amazon.in/s?k=muscleblaze+biozyme+performance+whey+rich+chocolate+1kg"
+        },
+        {
+          "name": "HealthKart",
+          "color": "#16a34a",
+          "price": null,
+          "mrp": null,
+          "url": "https://www.healthkart.com/search?q=muscleblaze+biozyme+performance+whey"
+        },
+        {
+          "name": "Blinkit",
+          "color": "#facc15",
+          "price": null,
+          "mrp": null,
+          "url": "https://blinkit.com/s/?q=muscleblaze%20biozyme%20whey"
+        },
+        {
+          "name": "Zepto",
+          "color": "#7c3aed",
+          "price": null,
+          "mrp": null,
+          "url": "https://www.zeptonow.com/search?query=muscleblaze%20biozyme%20whey"
+        },
+        {
+          "name": "Swiggy Instamart",
+          "color": "#f97316",
+          "price": null,
+          "mrp": null,
+          "url": "https://www.swiggy.com/instamart/search?query=muscleblaze%20biozyme%20whey"
+        }
+      ]
+    }
+  ]
+}
