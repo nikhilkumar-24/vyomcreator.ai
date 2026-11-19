@@ -1,5 +1,7 @@
 const CACHE_SECONDS = 3600;
-const WINDOW_DAYS = 90;
+const START_DATE = '2024-01-01T00:00:00Z';
+const CHUNK_DAYS = 90;
+const DAY_MS = 24 * 60 * 60 * 1000;
 
 const QUERY = `query ($accountTag: string!, $since: Time!, $until: Time!) {
   viewer {
@@ -27,7 +29,37 @@ export async function onRequestGet({ request, env }) {
   }
 
   const until = new Date();
-  const since = new Date(until.getTime() - WINDOW_DAYS * 24 * 60 * 60 * 1000);
+  const windows = [];
+  for (let end = until; end > new Date(START_DATE); end = new Date(end.getTime() - CHUNK_DAYS * DAY_MS)) {
+    const start = new Date(Math.max(end.getTime() - CHUNK_DAYS * DAY_MS, new Date(START_DATE).getTime()));
+    windows.push({ since: start.toISOString(), until: end.toISOString() });
+  }
+
+  const results = await Promise.all(windows.map((w) => fetchWindow(env, w)));
+  if (results.some((r) => r === null)) {
+    return Response.json({ visits: null }, { status: 502 });
+  }
+
+  const totals = new Map();
+  for (const groups of results) {
+    for (const g of groups) {
+      const code = g.dimensions?.countryName;
+      const visits = Number(g.sum?.visits) || 0;
+      if (code && visits > 0) totals.set(code, (totals.get(code) || 0) + visits);
+    }
+  }
+  const countries = [...totals].map(([code, visits]) => ({ code, visits })).sort((a, b) => b.visits - a.visits);
+  const visits = countries.reduce((total, c) => total + c.visits, 0);
+
+  const response = Response.json(
+    { visits, scope: 'all-time', countries },
+    { headers: { 'Cache-Control': `public, max-age=${CACHE_SECONDS}` } },
+  );
+  await cache.put(cacheKey, response.clone());
+  return response;
+}
+
+async function fetchWindow(env, { since, until }) {
   const res = await fetch('https://api.cloudflare.com/client/v4/graphql', {
     method: 'POST',
     headers: {
@@ -36,33 +68,12 @@ export async function onRequestGet({ request, env }) {
     },
     body: JSON.stringify({
       query: QUERY,
-      variables: {
-        accountTag: env.CF_ACCOUNT_ID,
-        since: since.toISOString(),
-        until: until.toISOString(),
-      },
+      variables: { accountTag: env.CF_ACCOUNT_ID, since, until },
     }),
   });
-
-  if (!res.ok) {
-    return Response.json({ visits: null }, { status: 502 });
-  }
-
+  if (!res.ok) return null;
   const body = await res.json();
   const groups = body?.data?.viewer?.accounts?.[0]?.rumPageloadEventsAdaptiveGroups;
-  if (!Array.isArray(groups)) {
-    return Response.json({ visits: null }, { status: 502 });
-  }
-
-  const countries = groups
-    .map((g) => ({ code: g.dimensions?.countryName, visits: Number(g.sum?.visits) || 0 }))
-    .filter((c) => c.code && c.visits > 0);
-  const visits = countries.reduce((total, c) => total + c.visits, 0);
-
-  const response = Response.json(
-    { visits, days: WINDOW_DAYS, countries },
-    { headers: { 'Cache-Control': `public, max-age=${CACHE_SECONDS}` } },
-  );
-  await cache.put(cacheKey, response.clone());
-  return response;
+  return Array.isArray(groups) ? groups : null;
 }
+

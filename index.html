@@ -25,6 +25,13 @@
 <header class="nav"><div class="brand"><a href="/" class="vyom-logo" aria-label="VYOM Creator AI home"><span class="vyom-logo-word">VYOM<i class="vyom-logo-star">✦</i></span><span class="vyom-logo-sub">Creator AI</span></a></div><div class="nav-row"><nav class="nav-links"><a href="/" class="navlink active">Home</a><a href="/hooks" class="navlink">Hooks</a><a href="/sfx" class="navlink">SFX</a><a href="/beatline" class="navlink">Beatline</a><a href="/captions" class="navlink">Captions</a><a href="/compare" class="navlink">ProteinPick<span class="new-badge">New</span></a></nav><div class="pill">✦ CREATOR GROWTH LAB · BETA</div></div></header>
 
 <main>
+<section class="lp-reach-band" id="reach" hidden>
+  <p class="lp-eyebrow">Where creators use VYOM</p>
+  <h2>Creators in <span id="reach-count">—</span> countries</h2>
+  <div id="globe" class="lp-globe" role="img" aria-label="Globe showing the countries where VYOM is used"></div>
+  <ul id="reach-list" class="lp-reach-list"></ul>
+  <p class="lp-reach-more" id="reach-more"></p>
+</section>
 <section class="lp-hero">
   <div class="lp-hero-inner">
     <a class="lp-pill lp-rise" href="#tools"><span class="lp-tag">Beta</span><span>Four creator tools, one account</span></a>
@@ -142,16 +149,6 @@
   </div>
 </section>
 
-<section class="lp-section" id="reach" hidden>
-  <div class="lp-wrap lp-reach">
-    <p class="lp-eyebrow">Where creators use VYOM</p>
-    <h2>Creators in <span id="reach-count">—</span> countries</h2>
-    <p class="lp-reach-sub">Visits from the last 90 days. Drag the globe to explore.</p>
-    <div id="globe" class="lp-globe" role="img" aria-label="Globe showing the countries where VYOM is used"></div>
-    <ul id="reach-list" class="lp-reach-list"></ul>
-  </div>
-</section>
-
 <section class="lp-section" style="padding-top:0">
   <div class="lp-wrap"><p class="lp-note">Scores are directional content-readiness estimates, not predicted views. Instagram ranking, audience response and distribution can change outcomes.</p></div>
 </section>
@@ -202,15 +199,20 @@
 
     section.hidden = false;
     document.getElementById('reach-count').textContent = countries.length;
-    document.getElementById('reach-list').innerHTML = countries
+    const top = countries.slice(0, 6);
+    document.getElementById('reach-list').innerHTML = top
       .map((c) => `<li><span>${regionNames.of(c.code) || c.code}</span><strong>${c.visits.toLocaleString('en-IN')}</strong></li>`)
       .join('');
+    const more = countries.length - top.length;
+    document.getElementById('reach-more').textContent = more > 0
+      ? `…and ${more} more ${more === 1 ? 'country' : 'countries'} are using VYOM too.`
+      : '';
 
     const maxVisits = Math.max(...points.map((p) => p.visits), 1);
     const container = document.getElementById('globe');
     const globe = Globe()(container)
       .width(container.clientWidth)
-      .height(420)
+      .height(container.clientHeight)
       .backgroundColor('rgba(0,0,0,0)')
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
       .atmosphereColor('#a78bfa')
@@ -223,14 +225,14 @@
       .pointLabel((d) => `${d.name}: ${d.visits.toLocaleString('en-IN')} visits`);
     globe.controls().autoRotate = true;
     globe.controls().autoRotateSpeed = 0.6;
-    const top = points.reduce((a, b) => (b.visits > a.visits ? b : a), points[0]);
-    if (top) globe.pointOfView({ lat: top.lat, lng: top.lng, altitude: 2 }, 0);
+    const leader = points.reduce((a, b) => (b.visits > a.visits ? b : a), points[0]);
+    if (leader) globe.pointOfView({ lat: leader.lat, lng: leader.lng, altitude: 2 }, 0);
     window.addEventListener('resize', () => globe.width(container.clientWidth));
   }
 
   fetch('/api/stats').then(r => r.ok ? r.json() : null).then(d => {
     if (!d || !Number.isFinite(d.visits)) return;
-    document.getElementById('visit-count').textContent = d.visits.toLocaleString('en-IN') + ' visits · last ' + d.days + ' days';
+    document.getElementById('visit-count').textContent = d.visits.toLocaleString('en-IN') + ' visits · all time';
     if (Array.isArray(d.countries) && d.countries.length) {
       loadScript('https://unpkg.com/globe.gl@2.46.2/dist/globe.gl.min.js').then(() => renderReach(d.countries)).catch(() => {});
     }
