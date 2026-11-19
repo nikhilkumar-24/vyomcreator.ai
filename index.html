@@ -25,11 +25,11 @@
 <header class="nav"><div class="brand"><a href="/" class="vyom-logo" aria-label="VYOM Creator AI home"><span class="vyom-logo-word">VYOM<i class="vyom-logo-star">✦</i></span><span class="vyom-logo-sub">Creator AI</span></a></div><div class="nav-row"><nav class="nav-links"><a href="/" class="navlink active">Home</a><a href="/hooks" class="navlink">Hooks</a><a href="/sfx" class="navlink">SFX</a><a href="/beatline" class="navlink">Beatline</a><a href="/captions" class="navlink">Captions</a><a href="/compare" class="navlink">ProteinPick<span class="new-badge">New</span></a></nav><div class="pill">✦ CREATOR GROWTH LAB · BETA</div></div></header>
 
 <main>
-<section class="lp-reach-band" id="reach" hidden>
+<section class="lp-reach-band" id="reach">
   <p class="lp-eyebrow">Where creators use VYOM</p>
   <h2>Worker requests by region</h2>
-  <div id="globe" class="lp-globe" role="img" aria-label="Globe showing the countries where VYOM is used"></div>
-  <ul id="reach-list" class="lp-reach-list"></ul>
+  <div id="globe" class="lp-globe" role="img" aria-label="Globe showing the regions where VYOM is used"></div>
+  <ul id="reach-list" class="lp-reach-list"><li><span>Loading region data…</span></li></ul>
   <p class="lp-reach-more" id="reach-more"></p>
 </section>
 <section class="lp-hero">
@@ -203,11 +203,13 @@
   };
 
   function renderReach(colos) {
-    const section = document.getElementById('reach');
     const points = colos
       .filter((c) => COLOS[c.code])
       .map((c) => ({ lat: COLOS[c.code][0], lng: COLOS[c.code][1], requests: c.requests, name: `${COLOS[c.code][2]}, ${COLOS[c.code][3]} (${c.code})` }));
-    if (!colos.length) return;
+    if (!colos.length) {
+      document.getElementById('reach-list').innerHTML = '<li><span>Region data is unavailable right now.</span></li>';
+      return;
+    }
 
     const regions = new Map();
     for (const c of colos) {
@@ -227,7 +229,6 @@
         return `<li><span>${name} · ${share}%<small>${top}</small></span><strong>${r.requests.toLocaleString('en-IN')}</strong></li>`;
       });
 
-    section.hidden = false;
     document.getElementById('reach-list').innerHTML = rows.join('');
     document.getElementById('reach-more').textContent = '';
 
@@ -254,12 +255,14 @@
   }
 
   fetch('/api/stats').then(r => r.ok ? r.json() : null).then(d => {
-    if (!d || !Number.isFinite(d.visits)) return;
+    if (!d || !Number.isFinite(d.visits)) return renderReach([]);
     document.getElementById('visit-count').textContent = d.visits.toLocaleString('en-IN') + ' visits · ' + (d.invocations ?? 0).toLocaleString('en-IN') + ' Worker invocations · last 6 months';
     if (Array.isArray(d.colos) && d.colos.length) {
       loadScript('https://unpkg.com/globe.gl@2.46.2/dist/globe.gl.min.js').then(() => renderReach(d.colos)).catch(() => {});
+    } else {
+      renderReach([]);
     }
-  }).catch(() => {});
+  }).catch(() => renderReach([]));
 
   function loadScript(src) {
     return new Promise((resolve, reject) => {
