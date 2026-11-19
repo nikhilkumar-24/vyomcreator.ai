@@ -66,7 +66,7 @@
 <section class="cmp-head">
   <div class="eyebrow">ProteinPick · Supplement price comparison</div>
   <h1>Search a supplement</h1>
-  <p class="sub">Type a product name to see MuscleBlaze suggestions, then compare it with Blinkit, Zepto and Swiggy Instamart.</p>
+  <p class="sub">Type a product name to see MuscleBlaze suggestions with live prices from MuscleBlaze and HealthKart, then compare with Amazon.in, Blinkit, Zepto and Swiggy Instamart.</p>
 </section>
 <section class="cmp-search">
   <input id="cmpQ" class="cmp-input" type="text" placeholder="e.g. Biozyme, Creatine, Whey Isolate" autocomplete="off" aria-label="Search MuscleBlaze products" aria-controls="cmpSuggest" aria-expanded="false" role="combobox">
@@ -149,8 +149,13 @@ function renderBoard(s) {
       name: st.name, logo: st.logo, color: st.color, price: az.price, mrp: null,
       url: az.url || st.search(q), cta: 'View on Amazon.in →', note: az.title || 'Price for "' + q + '" on Amazon.in'
     };
+    const hk = st.name === 'HealthKart' && s.healthkart && typeof s.healthkart.price === 'number' ? s.healthkart : null;
+    if (hk) return {
+      name: st.name, logo: st.logo, color: st.color, price: hk.price, mrp: hk.mrp,
+      url: hk.url || st.search(q), cta: 'View on HealthKart →',
+      note: hk.inStock === false ? 'Out of stock' : 'Official site · Live price'
+    };
     return {
-      name: st.name, logo: st.logo, color: st.color, price: null, mrp: null,
       url: st.search(q), cta: 'Search on ' + st.name + ' →', note: 'Opens search for "' + q + '" on ' + st.name + '.'
     };
   })];
