@@ -382,7 +382,7 @@ body.landing .lp-lede {
   color: #a1a1aa;
 }
 
-.lp-note {
+body.landing .lp-note {
   max-width: 768px;
   margin: 0 auto;
   padding: 16px 20px;
