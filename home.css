@@ -182,7 +182,7 @@ body.landing .lp-btn-outline { border-color: #3f3f46; color: #fafafa; background
   margin-bottom: 24px;
 }
 .lp-hero h1 .lp-muted { color: #71717a; }
-.lp-lede {
+body.landing .lp-lede {
   max-width: 672px;
   margin: 0 auto 56px;
   font-size: 18px;
