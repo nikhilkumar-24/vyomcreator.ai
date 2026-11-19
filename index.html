@@ -27,7 +27,7 @@
 <main>
 <section class="lp-reach-band" id="reach" hidden>
   <p class="lp-eyebrow">Where creators use VYOM</p>
-  <h2>Requests served from <span id="reach-count">—</span> Cloudflare locations</h2>
+  <h2>Worker requests by region</h2>
   <div id="globe" class="lp-globe" role="img" aria-label="Globe showing the countries where VYOM is used"></div>
   <ul id="reach-list" class="lp-reach-list"></ul>
   <p class="lp-reach-more" id="reach-more"></p>
@@ -195,6 +195,13 @@
     MCI: [39.3, -94.71, 'Kansas City', 'US'], DUB: [53.42, -6.27, 'Dublin', 'IE'], WAW: [52.17, 20.97, 'Warsaw', 'PL']
   };
 
+  const REGION_OF = {
+    US: 'North America', CA: 'North America',
+    BR: 'South America', AR: 'South America',
+    CH: 'Europe', DE: 'Europe', FR: 'Europe', IT: 'Europe', GB: 'Europe', NL: 'Europe', DK: 'Europe', SE: 'Europe', IE: 'Europe', PL: 'Europe',
+    SG: 'Asia Pacific', IN: 'Asia Pacific', HK: 'Asia Pacific', KR: 'Asia Pacific', JP: 'Asia Pacific', BD: 'Asia Pacific', TH: 'Asia Pacific', AZ: 'Asia Pacific'
+  };
+
   function renderReach(colos) {
     const section = document.getElementById('reach');
     const points = colos
@@ -202,15 +209,26 @@
       .map((c) => ({ lat: COLOS[c.code][0], lng: COLOS[c.code][1], requests: c.requests, name: `${COLOS[c.code][2]}, ${COLOS[c.code][3]} (${c.code})` }));
     if (!colos.length) return;
 
+    const regions = new Map();
+    for (const c of colos) {
+      const info = COLOS[c.code];
+      const region = (info && REGION_OF[info[3]]) || 'Other';
+      const r = regions.get(region) || { requests: 0, cities: [] };
+      r.requests += c.requests;
+      if (info) r.cities.push(info[2]);
+      regions.set(region, r);
+    }
+    const total = colos.reduce((sum, c) => sum + c.requests, 0) || 1;
+    const rows = [...regions]
+      .sort((a, b) => b[1].requests - a[1].requests)
+      .map(([name, r]) => {
+        const share = Math.round((r.requests / total) * 100);
+        const top = r.cities.slice(0, 3).join(', ');
+        return `<li><span>${name} · ${share}%<small>${top}</small></span><strong>${r.requests.toLocaleString('en-IN')}</strong></li>`;
+      });
+
     section.hidden = false;
-    document.getElementById('reach-count').textContent = colos.length;
-    document.getElementById('reach-list').innerHTML = colos
-      .map((c) => {
-        const info = COLOS[c.code];
-        const label = info ? `${info[2]}, ${info[3]} (${c.code})` : c.code;
-        return `<li><span>${label}</span><strong>${c.requests.toLocaleString('en-IN')}</strong></li>`;
-      })
-      .join('');
+    document.getElementById('reach-list').innerHTML = rows.join('');
     document.getElementById('reach-more').textContent = '';
 
     const maxRequests = Math.max(...points.map((p) => p.requests), 1);
