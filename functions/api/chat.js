@@ -4,10 +4,10 @@ const MAX_CHARS = 1000;
 
 const SITE_PAGES = [
   { title: 'VYOM AI home', url: '/', keywords: 'home landing vyom ai creators growth lab overview about start', summary: 'Overview of VYOM AI and its four tools for creators.' },
-  { title: 'Reel Hook Analyzer', url: '/hooks.html', keywords: 'hook hooks analyze analyzer reel story pacing hashtags trends score retention intro', summary: 'Scores a reel hook and story, suggests edits and trend-based hashtags. Works in English, Hindi, Kannada and Tamil.' },
+  { title: 'Reel Hook Analyzer', url: '/hooks.html', keywords: 'hook hooks analyze analyzer reel story pacing hashtags trends score retention intro', summary: 'Scores a reel hook and story, suggests edits and trend-based hashtags. Works in 17 languages including Hindi, Kannada, Tamil, Bengali, Malayalam, Telugu, French, Spanish, Chinese, Japanese, Korean and more.' },
   { title: 'Free SFX Library', url: '/sfx.html', keywords: 'sfx sound effects sound library whoosh ping transition audio free download', summary: 'Royalty-free sound effects for reels and short videos.' },
   { title: 'Beatline', url: '/beatline.html', keywords: 'beatline beat timeline scene sfx cuts plan storyboard music sync', summary: 'Plan a reel with a scene and sound-effect timeline, lined up to cuts and beats.' },
-  { title: 'Captions Studio', url: '/captions.html', keywords: 'captions caption subtitles subtitle transcribe transcription language english hindi kannada tamil font style export download video', summary: 'Auto-captions in English, Hindi, Kannada or Tamil, creator styles and browser export.' }
+  { title: 'Captions Studio', url: '/captions.html', keywords: 'captions caption subtitles subtitle transcribe transcription language english hindi kannada tamil font style export download video', summary: 'Auto-captions in 17 languages including English, Hindi, Kannada, Tamil, Bengali, Malayalam, Telugu, French, Spanish, Chinese, Japanese, Korean and more; creator styles and browser export.' }
 ];
 
 function searchSite(query) {

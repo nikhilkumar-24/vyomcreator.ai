@@ -18,7 +18,7 @@
 <meta name="twitter:description" content="Stylish, animated captions for your reels with auto-transcription and one-click export.">
 <meta name="twitter:image" content="https://www.vyomcreator.ai/vyom-main.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Bebas+Neue&family=Dela+Gothic+One&family=Luckiest+Guy&family=Montserrat:wght@400;700;800;900&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:wght@700&family=Noto+Sans+Devanagari:wght@800&family=Noto+Sans+Kannada:wght@800&family=Noto+Sans+Tamil:wght@800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Bebas+Neue&family=Dela+Gothic+One&family=Luckiest+Guy&family=Montserrat:wght@400;700;800;900&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:wght@700&family=Noto+Sans+Devanagari:wght@800&family=Noto+Sans+Kannada:wght@800&family=Noto+Sans+Tamil:wght@800&family=Noto+Sans+Bengali:wght@800&family=Noto+Sans+Malayalam:wght@800&family=Noto+Sans+Telugu:wght@800&family=Noto+Sans+JP:wght@800&family=Noto+Sans+KR:wght@800&family=Noto+Sans+SC:wght@800&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="app.css">
 <style>
 .cap-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;margin-top:18px;align-items:start}
@@ -67,6 +67,19 @@
           <option value="hi">Hindi · all text in Hindi</option>
           <option value="kn">Kannada · all text in Kannada</option>
           <option value="ta">Tamil · all text in Tamil</option>
+          <option value="bn">Bengali · all text in Bengali</option>
+          <option value="ml">Malayalam · all text in Malayalam</option>
+          <option value="te">Telugu · all text in Telugu</option>
+          <option value="fr">French · all text in French</option>
+          <option value="es">Spanish · all text in Spanish</option>
+          <option value="zh">Chinese (Mandarin) · all text in Chinese</option>
+          <option value="ms">Malay · all text in Malay</option>
+          <option value="ro">Romanian · all text in Romanian</option>
+          <option value="de">German · all text in German</option>
+          <option value="ja">Japanese · all text in Japanese</option>
+          <option value="pt">Portuguese · all text in Portuguese</option>
+          <option value="it">Italian · all text in Italian</option>
+          <option value="ko">Korean · all text in Korean</option>
         </select>
       </div>
     </div>
@@ -140,11 +153,18 @@ const PRESETS = {
 };
 const FONTS = ['Bangers', 'Luckiest Guy', 'Dela Gothic One', 'Pacifico', 'Anton', 'Bebas Neue', 'Montserrat', 'Permanent Marker', 'Playfair Display', 'Arial'];
 const FONT_WEIGHTS = { 'Montserrat': 800 };
-// Indic scripts render with Noto fonts; Latin display fonts have no glyphs for them.
+// Non-Latin scripts render with Noto fonts; Latin display fonts have no glyphs for them.
+// Japanese kana is matched before Han so Japanese lines get the JP font rather than the Chinese one.
 const INDIC_FONTS = [
   { re: /[\u0900-\u097F]/, family: 'Noto Sans Devanagari' },
   { re: /[\u0C80-\u0CFF]/, family: 'Noto Sans Kannada' },
-  { re: /[\u0B80-\u0BFF]/, family: 'Noto Sans Tamil' }
+  { re: /[\u0B80-\u0BFF]/, family: 'Noto Sans Tamil' },
+  { re: /[\u0980-\u09FF]/, family: 'Noto Sans Bengali' },
+  { re: /[\u0D00-\u0D7F]/, family: 'Noto Sans Malayalam' },
+  { re: /[\u0C00-\u0C7F]/, family: 'Noto Sans Telugu' },
+  { re: /[\u3040-\u30FF]/, family: 'Noto Sans JP' },
+  { re: /[\uAC00-\uD7AF\u1100-\u11FF]/, family: 'Noto Sans KR' },
+  { re: /[\u4E00-\u9FFF]/, family: 'Noto Sans SC' }
 ];
 function indicFamily(text) {
   const hit = INDIC_FONTS.find(f => f.re.test(text));

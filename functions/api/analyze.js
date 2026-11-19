@@ -1,7 +1,12 @@
 const MODEL = '@cf/google/gemma-4-26b-a4b-it';
 const TEXT_MODEL = '@cf/zai-org/glm-4.7-flash';
 const MAX_VIDEO_BYTES = 500 * 1024 * 1024;
-const LANGUAGE_NAMES = { en: 'English', hi: 'Hindi (Devanagari script)', kn: 'Kannada (Kannada script)', ta: 'Tamil (Tamil script)' };
+const LANGUAGE_NAMES = {
+  en: 'English', hi: 'Hindi (Devanagari script)', kn: 'Kannada (Kannada script)', ta: 'Tamil (Tamil script)',
+  bn: 'Bengali (Bengali script)', ml: 'Malayalam (Malayalam script)', te: 'Telugu (Telugu script)',
+  fr: 'French', es: 'Spanish', zh: 'Chinese (Simplified, Mandarin)', ms: 'Malay', ro: 'Romanian',
+  de: 'German', ja: 'Japanese (Japanese script)', pt: 'Portuguese', it: 'Italian', ko: 'Korean (Hangul script)'
+};
 
 // Returns the report in one language by replacing the English text with that language's block.
 function localize(result, lang) {

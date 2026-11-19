@@ -3,8 +3,13 @@ const TRANSLATE_MODEL = '@cf/meta/m2m100-1.2b';
 // 16 kHz mono 16-bit WAV is ~1.9 MB per minute; 12 MB of base64 covers roughly 5 minutes of audio.
 const MAX_AUDIO_BASE64 = 12 * 1024 * 1024;
 const TRANSLATE_CONCURRENCY = 6;
-const LANGUAGES = new Set(['en', 'hi', 'kn', 'ta']);
-const LANGUAGE_NAMES = { english: 'en', hindi: 'hi', kannada: 'kn', tamil: 'ta' };
+const LANGUAGES = new Set(['en', 'hi', 'kn', 'ta', 'bn', 'ml', 'te', 'fr', 'es', 'zh', 'ms', 'ro', 'de', 'ja', 'pt', 'it', 'ko']);
+const LANGUAGE_NAMES = {
+  english: 'en', hindi: 'hi', kannada: 'kn', tamil: 'ta',
+  bengali: 'bn', malayalam: 'ml', telugu: 'te', french: 'fr', spanish: 'es',
+  mandarin: 'zh', chinese: 'zh', malay: 'ms', roman: 'ro', romanian: 'ro',
+  german: 'de', japanese: 'ja', portuguese: 'pt', italian: 'it', korean: 'ko'
+};
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' } });
