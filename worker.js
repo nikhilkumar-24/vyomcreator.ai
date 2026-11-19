@@ -3,6 +3,7 @@ import { onRequestGet as trendsGet } from './functions/api/trends.js';
 import { onRequestPost as beatlinePost } from './functions/api/beatline.js';
 import { onRequestPost as captionsPost } from './functions/api/captions.js';
 import { onRequestPost as chatPost } from './functions/api/chat.js';
+import { onRequestGet as amazonGet } from './functions/api/amazon.js';
 import { onRequestGet as searchGet } from './functions/api/search.js';
 import { onRequestGet as statsGet } from './functions/api/stats.js';
 
@@ -29,6 +30,9 @@ export default {
     }
     if (url.pathname === '/api/chat' && request.method === 'POST') {
       return chatPost({ request, env, ctx });
+    }
+    if (url.pathname === '/api/amazon' && request.method === 'GET') {
+      return amazonGet({ request, env, ctx });
     }
     if (url.pathname === '/api/search' && request.method === 'GET') {
       return searchGet({ request, env, ctx });

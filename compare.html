@@ -79,7 +79,7 @@
   </div>
   <div class="cmp-toolbar"><span class="cmp-status" id="cmpStatus"></span></div>
   <div class="cmp-list" id="cmpList"></div>
-  <div class="cmp-footnote">Quick-commerce prices depend on your delivery location, so they are not shown here. Each row opens that store's search for the same product.</div>
+  <div class="cmp-footnote">Each row opens that store's search for the same product. Prices are listed lowest first, and stores without a price are shown at the bottom.</div>
 </section>
 </main>
 <footer class="footer">VYOM.AI · Built for creators</footer>
@@ -121,19 +121,40 @@ function rowHtml(r) {
     : `<div class="cmp-row${hasPrice ? ' has-price' : ''}">${body}</div>`;
 }
 
+function boardQuery(s) {
+  return s.query ? (/muscleblaze/i.test(s.query) ? s.query : 'MuscleBlaze ' + s.query) : s.name;
+}
+
+// Lowest price first; rows without a price keep their order at the bottom.
+function byPrice(a, b) {
+  const ap = typeof a.price === 'number', bp = typeof b.price === 'number';
+  if (ap && bp) return a.price - b.price;
+  return (bp ? 1 : 0) - (ap ? 1 : 0);
+}
+
+let current = null;
+let amazon = null;
+
 function renderBoard(s) {
-  const q = s.query ? (/muscleblaze/i.test(s.query) ? s.query : 'MuscleBlaze ' + s.query) : s.name;
+  const q = boardQuery(s);
   document.getElementById('cmpName').textContent = s.name;
   document.getElementById('cmpVariant').textContent = s.variant ? 'Price shown for: ' + s.variant : s.brand;
   const rows = [{
     name: 'MuscleBlaze', logo: 'logos/muscleblaze.svg', color: '#e11d48',
     price: s.price, mrp: s.mrp, url: s.url, cta: 'View on MuscleBlaze →',
     note: s.inStock === false ? 'Out of stock' : 'Official site · Normal member price'
-  }, ...STORES.map(st => ({
-    name: st.name, logo: st.logo, color: st.color, price: null, mrp: null,
-    url: st.search(q), cta: 'Search on ' + st.name + ' →',
-    note: 'Opens search for "' + q + '" on ' + st.name + '.'
-  }))];
+  }, ...STORES.map(st => {
+    const az = st.name === 'Amazon.in' && amazon && amazon.q === q && typeof amazon.price === 'number' ? amazon : null;
+    if (az) return {
+      name: st.name, logo: st.logo, color: st.color, price: az.price, mrp: null,
+      url: az.url || st.search(q), cta: 'View on Amazon.in →', note: az.title || 'Price for "' + q + '" on Amazon.in'
+    };
+    return {
+      name: st.name, logo: st.logo, color: st.color, price: null, mrp: null,
+      url: st.search(q), cta: 'Search on ' + st.name + ' →', note: 'Opens search for "' + q + '" on ' + st.name + '.'
+    };
+  })];
+  rows.sort(byPrice);
   document.getElementById('cmpList').innerHTML = rows.map(rowHtml).join('');
   document.getElementById('cmpStatus').textContent = s.inStock === false
     ? 'This MuscleBlaze variant is out of stock.'
@@ -157,7 +178,22 @@ function choose(i) {
   input.value = s.name;
   box.hidden = true;
   input.setAttribute('aria-expanded', 'false');
+  current = s;
   renderBoard(s);
+  loadAmazon(s);
+}
+
+async function loadAmazon(s) {
+  const q = boardQuery(s);
+  try {
+    const res = await fetch('/api/amazon?q=' + encodeURIComponent(q));
+    const data = await res.json();
+    if (!data.ok) return;
+    amazon = { q, price: data.price, url: data.url, title: data.title };
+  } catch (e) {
+    return;
+  }
+  if (current === s) renderBoard(s);
 }
 
 async function search(q) {
