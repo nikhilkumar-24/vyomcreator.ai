@@ -22,7 +22,7 @@
           "color": "#f59e0b",
           "price": 3899,
           "mrp": 4999,
-          "note": "Amazon.in listing, seen 18 Nov 2026",
+          "note": "Amazon.in listing, last seen 18 Nov 2026 (could not re-check today)",
           "url": "https://www.amazon.in/MuscleBlaze-Biozyme-Performance-Protein-Powder/dp/B0GNS675V8"
         },
         {
@@ -37,9 +37,9 @@
         {
           "name": "Blinkit",
           "color": "#facc15",
-          "price": 4199,
+          "price": 3999,
           "mrp": 4999,
-          "note": "Rich Chocolate 1 kg listing, seen 23 Oct 2026. Price varies by location; may be out of date.",
+          "note": "Rich Chocolate 1 kg listing, checked 19 Nov 2026. Price varies by location.",
           "url": "https://blinkit.com/prn/muscleblaze-biozyme-performance-whey-protein-powder-1-kg/prid/491874"
         },
         {
@@ -54,9 +54,9 @@
           "name": "Swiggy Instamart",
           "logo": "logos/swiggy-instamart.svg",
           "color": "#f97316",
-          "price": 3599,
-          "mrp": 4999,
-          "note": "Delhi listing, 7 Oct 2026 (Rozmo). Price varies by location; may be out of date.",
+          "price": null,
+          "mrp": null,
+          "note": "Listing shows Sold Out (28 servings, Rich Chocolate). No price to show right now.",
           "url": "https://www.swiggy.com/stores/instamart/p/muscleblaze-biozyme-performance-rich-chocolate-WV4XGQCZB5?storeId=836516"
         }
       ]
