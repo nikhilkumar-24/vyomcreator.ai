@@ -87,9 +87,9 @@
 function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 const inr = n => '₹' + Number(n).toLocaleString('en-IN');
 const STORES = [
-  { name: 'Blinkit', color: '#facc15', search: q => `https://blinkit.com/s/?q=${encodeURIComponent(q)}` },
+  { name: 'Blinkit', color: '#facc15', hint: 'Allow location on Blinkit when it asks to see prices near you.', search: q => `https://blinkit.com/s/?q=${encodeURIComponent(q)}` },
   { name: 'Zepto', color: '#7c3aed', logo: 'logos/zepto.svg', search: q => `https://www.zeptonow.com/search?query=${encodeURIComponent(q)}` },
-  { name: 'Swiggy Instamart', color: '#f97316', logo: 'logos/swiggy-instamart.svg', search: q => `https://www.swiggy.com/instamart/search?query=${encodeURIComponent(q)}` }
+  { name: 'Swiggy Instamart', color: '#f97316', logo: 'logos/swiggy-instamart.svg', hint: 'Allow location on Instamart when it asks to see prices near you.', search: q => `https://www.swiggy.com/instamart/search?query=${encodeURIComponent(q)}` }
 ];
 const input = document.getElementById('cmpQ');
 const box = document.getElementById('cmpSuggest');
@@ -130,7 +130,7 @@ function renderBoard(s) {
   }, ...STORES.map(st => ({
     name: st.name, logo: st.logo, color: st.color, price: null, mrp: null,
     url: st.search(q), cta: 'Search on ' + st.name + ' →',
-    note: 'Opens search for "' + q + '". Price depends on your location.'
+    note: st.hint || ('Opens search for "' + q + '". Price depends on your location.')
   }))];
   document.getElementById('cmpList').innerHTML = rows.map(rowHtml).join('');
   document.getElementById('cmpStatus').textContent = s.inStock === false
