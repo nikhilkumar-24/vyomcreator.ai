@@ -375,7 +375,7 @@ body.landing .lp-lede {
 body.landing .lp-reach-band h2 { margin: 4px 0 0; font-size: clamp(22px, 3vw, 30px); }
 .lp-globe { width: 100%; height: clamp(240px, 38vh, 340px); margin: 0 auto; cursor: grab; }
 .lp-globe:active { cursor: grabbing; }
-.lp-reach-list { list-style: none; margin: 0 auto; padding: 0; max-width: 960px; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; }
+.lp-reach-list { list-style: none; margin: 0 auto; padding: 0; max-width: 960px; max-height: 160px; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
 .lp-reach-list li { display: flex; justify-content: space-between; padding: 8px 12px; border: 1px solid #1a1a1a; border-radius: 10px; font-size: 13px; color: #a1a1aa; }
 .lp-reach-list li strong { color: #fafafa; font-weight: 600; }
 body.landing .lp-reach-more { margin: 8px 0 0; color: #71717a; font-size: 13px; }

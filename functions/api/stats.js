@@ -1,7 +1,21 @@
 const CACHE_SECONDS = 3600;
 const START_DATE = '2024-01-01T00:00:00Z';
 const CHUNK_DAYS = 90;
+const WORKER_CHUNK_DAYS = 28;
 const DAY_MS = 24 * 60 * 60 * 1000;
+
+const WORKER_QUERY = `query ($accountTag: string!, $since: Time!, $until: Time!) {
+  viewer {
+    accounts(filter: { accountTag: $accountTag }) {
+      workersInvocationsAdaptive(
+        limit: 10000
+        filter: { datetime_geq: $since, datetime_leq: $until }
+      ) {
+        sum { requests }
+      }
+    }
+  }
+}`;
 
 const QUERY = `query ($accountTag: string!, $since: Time!, $until: Time!) {
   viewer {
@@ -28,20 +42,16 @@ export async function onRequestGet({ request, env }) {
     return Response.json({ visits: null }, { status: 503 });
   }
 
-  const until = new Date();
-  const windows = [];
-  for (let end = until; end > new Date(START_DATE); end = new Date(end.getTime() - CHUNK_DAYS * DAY_MS)) {
-    const start = new Date(Math.max(end.getTime() - CHUNK_DAYS * DAY_MS, new Date(START_DATE).getTime()));
-    windows.push({ since: start.toISOString(), until: end.toISOString() });
-  }
-
-  const results = await Promise.all(windows.map((w) => fetchWindow(env, w)));
-  if (results.some((r) => r === null)) {
+  const [visitResults, workerResults] = await Promise.all([
+    Promise.all(windowsFor(CHUNK_DAYS).map((w) => fetchWindow(env, QUERY, 'rumPageloadEventsAdaptiveGroups', w))),
+    Promise.all(windowsFor(WORKER_CHUNK_DAYS).map((w) => fetchWindow(env, WORKER_QUERY, 'workersInvocationsAdaptive', w))),
+  ]);
+  if (visitResults.includes(null) || workerResults.includes(null)) {
     return Response.json({ visits: null }, { status: 502 });
   }
 
   const totals = new Map();
-  for (const groups of results) {
+  for (const groups of visitResults) {
     for (const g of groups) {
       const code = g.dimensions?.countryName;
       const visits = Number(g.sum?.visits) || 0;
@@ -50,16 +60,29 @@ export async function onRequestGet({ request, env }) {
   }
   const countries = [...totals].map(([code, visits]) => ({ code, visits })).sort((a, b) => b.visits - a.visits);
   const visits = countries.reduce((total, c) => total + c.visits, 0);
+  const invocations = workerResults.flat().reduce((total, g) => total + (Number(g.sum?.requests) || 0), 0);
 
   const response = Response.json(
-    { visits, scope: 'all-time', countries },
+    { visits, invocations, scope: 'all-time', countries },
     { headers: { 'Cache-Control': `public, max-age=${CACHE_SECONDS}` } },
   );
   await cache.put(cacheKey, response.clone());
   return response;
 }
 
-async function fetchWindow(env, { since, until }) {
+function windowsFor(days) {
+  const floor = new Date(START_DATE).getTime();
+  const windows = [];
+  for (let end = Date.now(); end > floor; end -= days * DAY_MS) {
+    windows.push({
+      since: new Date(Math.max(end - days * DAY_MS, floor)).toISOString(),
+      until: new Date(end).toISOString(),
+    });
+  }
+  return windows;
+}
+
+async function fetchWindow(env, query, field, { since, until }) {
   const res = await fetch('https://api.cloudflare.com/client/v4/graphql', {
     method: 'POST',
     headers: {
@@ -67,13 +90,13 @@ async function fetchWindow(env, { since, until }) {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-      query: QUERY,
+      query,
       variables: { accountTag: env.CF_ACCOUNT_ID, since, until },
     }),
   });
   if (!res.ok) return null;
   const body = await res.json();
-  const groups = body?.data?.viewer?.accounts?.[0]?.rumPageloadEventsAdaptiveGroups;
+  const groups = body?.data?.viewer?.accounts?.[0]?.[field];
   return Array.isArray(groups) ? groups : null;
 }
 

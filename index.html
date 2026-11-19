@@ -199,14 +199,11 @@
 
     section.hidden = false;
     document.getElementById('reach-count').textContent = countries.length;
-    const top = countries.slice(0, 6);
-    document.getElementById('reach-list').innerHTML = top
+    const list = document.getElementById('reach-list');
+    list.innerHTML = countries
       .map((c) => `<li><span>${regionNames.of(c.code) || c.code}</span><strong>${c.visits.toLocaleString('en-IN')}</strong></li>`)
       .join('');
-    const more = countries.length - top.length;
-    document.getElementById('reach-more').textContent = more > 0
-      ? `…and ${more} more ${more === 1 ? 'country' : 'countries'} are using VYOM too.`
-      : '';
+    document.getElementById('reach-more').textContent = '';
 
     const maxVisits = Math.max(...points.map((p) => p.visits), 1);
     const container = document.getElementById('globe');
@@ -232,7 +229,7 @@
 
   fetch('/api/stats').then(r => r.ok ? r.json() : null).then(d => {
     if (!d || !Number.isFinite(d.visits)) return;
-    document.getElementById('visit-count').textContent = d.visits.toLocaleString('en-IN') + ' visits · all time';
+    document.getElementById('visit-count').textContent = d.visits.toLocaleString('en-IN') + ' visits · ' + (d.invocations ?? 0).toLocaleString('en-IN') + ' Worker invocations · all time';
     if (Array.isArray(d.countries) && d.countries.length) {
       loadScript('https://unpkg.com/globe.gl@2.46.2/dist/globe.gl.min.js').then(() => renderReach(d.countries)).catch(() => {});
     }
