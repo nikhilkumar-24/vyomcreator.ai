@@ -62,6 +62,21 @@ a { color: inherit; }
 .navlink:hover { color: var(--text); }
 .navlink.active { color: var(--text); background: #18181b; }
 
+.new-badge {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 6px;
+  border-radius: 6px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  vertical-align: 1px;
+  color: #0a0a0a;
+  background: linear-gradient(135deg, #f5d142, #f59e0b);
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, .35);
+}
+
 .pill {
   border: 1px solid var(--line);
   color: var(--muted);
