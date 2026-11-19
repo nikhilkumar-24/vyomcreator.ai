@@ -1,0 +1,817 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Captions Studio — Add Stylish Captions to Reels | vyom.ai</title>
+<meta name="description" content="Add stylish, animated captions to your reels: auto-transcribed speech, creator fonts, mixed sizes and colors, then export the captioned video in your browser.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.vyomcreator.ai/captions">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="vyom.ai">
+<meta property="og:title" content="Captions Studio — Add Stylish Captions to Reels | vyom.ai">
+<meta property="og:description" content="Stylish, animated captions for your reels with auto-transcription and one-click export.">
+<meta property="og:url" content="https://www.vyomcreator.ai/captions">
+<meta property="og:image" content="https://www.vyomcreator.ai/vyom-main.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Captions Studio — Add Stylish Captions to Reels | vyom.ai">
+<meta name="twitter:description" content="Stylish, animated captions for your reels with auto-transcription and one-click export.">
+<meta name="twitter:image" content="https://www.vyomcreator.ai/vyom-main.png">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Bangers&family=Bebas+Neue&family=Dela+Gothic+One&family=Luckiest+Guy&family=Montserrat:wght@400;700;800;900&family=Pacifico&family=Permanent+Marker&family=Playfair+Display:wght@700&family=Noto+Sans+Devanagari:wght@800&family=Noto+Sans+Kannada:wght@800&family=Noto+Sans+Tamil:wght@800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="app.css">
+<style>
+.cap-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;margin-top:18px;align-items:start}
+.cap-row input[type=color]{height:42px;padding:4px;cursor:pointer}
+.cap-row .field.cap-reset{align-self:flex-end}
+@media (max-width:860px){.cap-layout{grid-template-columns:1fr}}
+.cap-stage{position:relative;background:#000;border-radius:14px;overflow:hidden;aspect-ratio:9/16;max-height:60vh;margin:12px auto 0;display:flex;align-items:center;justify-content:center}
+.cap-stage canvas{width:100%;height:100%;object-fit:contain;display:block}
+.cap-stage-empty{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#888;font-size:14px;text-align:center;padding:20px}
+.cap-row{display:flex;gap:10px;flex-wrap:wrap;align-items:flex-end;margin-top:10px}
+.cap-row .field{flex:1;min-width:120px;margin:0}
+.cap-row .field input,.cap-row .field select,.cap-row .field textarea{width:100%}
+.cap-row textarea{min-height:64px;resize:vertical}
+.cap-controls{display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap}
+.cap-controls .btn{width:auto;margin-top:0;padding:8px 14px}
+.cap-time{font-variant-numeric:tabular-nums;color:#bbb;font-size:13px;min-width:110px}
+.cap-timeline{margin-top:18px;overflow-x:auto;overflow-y:hidden;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.cap-tl-inner{position:relative;height:110px;min-width:100%}
+.cap-ruler{position:absolute;top:0;left:0;right:0;height:22px;border-bottom:1px solid var(--line);cursor:pointer}
+.cap-tick{position:absolute;top:0;height:22px;border-left:1px solid #27272a;color:#71717a;font-size:10px;padding-left:3px;line-height:22px;pointer-events:none}
+.cap-track{position:absolute;top:30px;bottom:8px;left:0;right:0;cursor:pointer}
+.cap-block{position:absolute;top:0;bottom:0;border-radius:8px;background:#27272a;color:#fafafa;font-size:12px;font-weight:600;padding:6px 10px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:grab;user-select:none;box-sizing:border-box;border:2px solid transparent}
+.cap-block.sel{border-color:#0a0a0a;box-shadow:0 0 0 1px #fafafa}
+.cap-block .h{position:absolute;top:0;bottom:0;width:8px;cursor:ew-resize}
+.cap-block .h.l{left:0}.cap-block .h.r{right:0}
+.cap-playhead{position:absolute;top:0;bottom:0;width:2px;background:#fafafa;pointer-events:none;z-index:2}
+.cap-bar{display:flex;gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--line);flex-wrap:wrap}
+.cap-bar label{font-size:12px;color:#aaa;display:flex;gap:6px;align-items:center}
+.cap-disabled{opacity:.45;pointer-events:none}
+</style>
+</head>
+<body>
+<header class="nav"><nav class="nav-links nav-left"><a href="/" class="navlink">Home</a><a href="/hooks" class="navlink">Hooks</a></nav><div class="brand"><a href="/" class="vyom-logo" aria-label="VYOM Creator AI home"><span class="vyom-logo-word">VYOM<i class="vyom-logo-star">✦</i></span><span class="vyom-logo-sub">Creator AI</span></a></div><div class="nav-end"><nav class="nav-links"><a href="/sfx" class="navlink">SFX</a><a href="/beatline" class="navlink">Beatline</a><a href="/captions" class="navlink active">Captions</a></nav><div class="pill">✦ CREATOR GROWTH LAB · BETA</div></div></header>
+<main class="wrap">
+<section class="hero"><div><div class="eyebrow">Stylized on-screen captions</div><h1>Captions that <span class="grad">pop.</span></h1><p>Upload a reel. Speech is transcribed automatically, then you can restyle each caption with colors, fonts and sizes, fine-tune the timing on the timeline, and download the captioned video.</p></div></section>
+
+<div class="cap-layout">
+  <div class="panel">
+    <h2>1 · Upload your video</h2>
+    <p class="sub">Up to 300 MB. Auto-captions use clips up to 5 minutes. Preview and export happen in your browser.</p>
+    <div class="cap-row">
+      <div class="field">
+        <label for="captionLang">Caption language (choose before uploading)</label>
+        <select id="captionLang">
+          <option value="en">English · all text in English, speech in other languages translated</option>
+          <option value="hi">Hindi · all text in Hindi</option>
+          <option value="kn">Kannada · all text in Kannada</option>
+          <option value="ta">Tamil · all text in Tamil</option>
+        </select>
+      </div>
+    </div>
+    <label class="drop" id="drop"><input id="videoFile" type="file" accept="video/mp4,video/quicktime,video/webm,video/x-m4v"><div><div class="symbol">⇧</div><strong>Drop your video here or browse</strong><small>MP4, MOV or WebM · Max 300 MB</small></div></label>
+    <div class="status" id="status" role="status"></div>
+    <div class="cap-stage" id="stage"><canvas id="canvas" width="720" height="1280"></canvas><div class="cap-stage-empty" id="stageEmpty">Your captioned preview appears here</div></div>
+    <div class="cap-controls">
+      <button type="button" class="btn" id="playBtn" disabled>▶ Play</button>
+      <span class="cap-time" id="timeLabel">0:00 / 0:00</span>
+      <button type="button" class="btn" id="addBtn" disabled style="background:#222;color:#eee">+ Caption at playhead</button>
+    </div>
+  </div>
+
+  <div class="panel" id="inspector">
+    <h2>2 · Style the selected caption</h2>
+    <p class="sub" id="inspectorHint">Select a caption on the timeline to edit its text, timing and style.</p>
+    <div id="editor" class="cap-disabled">
+      <div class="cap-row"><label class="field" style="flex:100%"><span>Caption text</span><textarea id="cText" placeholder="Type your caption"></textarea></label></div>
+      <div class="cap-row">
+        <label class="field"><span>Start (s)</span><input id="cStart" type="number" step="0.1" min="0"></label>
+        <label class="field"><span>End (s)</span><input id="cEnd" type="number" step="0.1" min="0"></label>
+      </div>
+      <div class="cap-row">
+        <label class="field"><span>Look</span><select id="cPreset"></select></label>
+        <label class="field"><span>Font</span><select id="cFont"></select></label>
+      </div>
+      <div class="cap-row">
+        <label class="field"><span>Size</span><select id="cSize"><option value="S">Small</option><option value="M" selected>Medium</option><option value="L">Large</option><option value="XL">Extra large</option></select></label>
+        <label class="field"><span>Text color</span><input id="cColor" type="color" value="#ffffff"></label>
+        <div class="field cap-reset"><button type="button" class="btn" id="cColorReset" style="margin-top:0;width:auto">Reset color</button></div>
+      </div>
+      <div class="cap-row">
+        <button type="button" class="btn" id="applyAllBtn" style="width:auto;margin-top:0">Apply this look to all captions</button>
+        <button type="button" class="btn" id="deleteBtn" style="width:auto;margin-top:0;background:#3b1219;color:#fecaca">Delete caption</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<section class="panel" style="margin-top:18px">
+  <h2>3 · Timeline</h2>
+  <p class="sub">Drag a caption to move it, drag its edges to change duration, click the ruler to seek. Zoom with the slider.</p>
+  <div class="cap-timeline" id="timeline"><div class="cap-tl-inner" id="tlInner"><div class="cap-ruler" id="ruler"></div><div class="cap-track" id="track"></div><div class="cap-playhead" id="playhead" style="left:0"></div></div></div>
+  <div class="cap-bar">
+    <label>Zoom <input id="zoom" type="range" min="20" max="240" value="80"></label>
+    <span class="note" id="countLabel">No captions yet</span>
+    <button type="button" class="btn" id="exportBtn" disabled style="width:auto;margin-top:0;margin-left:auto">⇩ Export captioned video</button>
+  </div>
+    <div class="status" id="exportStatus" role="status"></div>
+  <div id="exportResult"></div>
+</section>
+
+<div class="warning">Auto-captions come from speech recognition and can miss or mishear words, especially over loud music. Review the text before exporting. Export runs in real time in your browser, so keep this tab in the foreground until it finishes.</div>
+<footer class="footer">VYOM.AI · Built for creators · Auto-captions require Cloudflare Workers AI enabled on your account.</footer>
+</main>
+
+<script src="bat-loader.js"></script>
+<script>
+const $ = (id) => document.getElementById(id);
+const MAX_BYTES = 300 * 1024 * 1024;
+const MAX_AUTO_SECONDS = 300;
+const EXPORT_MAX_DIM = 1280;
+const SIZE_MUL = { S: 0.8, M: 1, L: 1.25, XL: 1.5 };
+
+// Each emphasis word takes the next color from `palette`, so one line mixes colors and sizes.
+const PRESETS = {
+  sticker:  { label: 'Sticker pop (red, blue, green)', font: 'Bangers', upper: true, fill: '#111111', size: 1.1, emph: { font: 'Bangers', sz: 1.55, palette: ['#E11D48', '#2563EB', '#16A34A'] }, plate: { kind: 'sticker', fill: '#FFFFFF', border: '#111111', tilt: -0.03 } },
+  hype:     { label: 'Hype overlay (pink, yellow, cyan)', font: 'Luckiest Guy', upper: true, fill: '#FFFFFF', stroke: '#000000', size: 0.95, emph: { font: 'Luckiest Guy', sz: 1.7, palette: ['#FF2BD6', '#FFE600', '#00F5FF'] }, plate: { kind: 'dark' } },
+  gradient: { label: 'Gradient pill + script accents', font: 'Dela Gothic One', fill: '#FFFFFF', size: 0.9, emph: { font: 'Pacifico', sz: 1.45, upper: false, palette: ['#FFE600', '#FFFFFF'] }, plate: { kind: 'gradient' } },
+  tag:      { label: 'Neon tag strip', font: 'Bebas Neue', upper: true, fill: '#FFFFFF', size: 1.25, emph: { font: 'Bebas Neue', sz: 1.6, palette: ['#00F5FF', '#FF2BD6'] }, plate: { kind: 'strip', fill: 'rgba(11,11,15,0.8)', bar: '#00F5FF' } }
+};
+const FONTS = ['Bangers', 'Luckiest Guy', 'Dela Gothic One', 'Pacifico', 'Anton', 'Bebas Neue', 'Montserrat', 'Permanent Marker', 'Playfair Display', 'Arial'];
+const FONT_WEIGHTS = { 'Montserrat': 800 };
+// Indic scripts render with Noto fonts; Latin display fonts have no glyphs for them.
+const INDIC_FONTS = [
+  { re: /[\u0900-\u097F]/, family: 'Noto Sans Devanagari' },
+  { re: /[\u0C80-\u0CFF]/, family: 'Noto Sans Kannada' },
+  { re: /[\u0B80-\u0BFF]/, family: 'Noto Sans Tamil' }
+];
+function indicFamily(text) {
+  const hit = INDIC_FONTS.find(f => f.re.test(text));
+  return hit ? hit.family : null;
+}
+
+const state = { duration: 0, videoW: 0, videoH: 0, captions: [], selectedId: null, nextId: 1, pps: 80, playing: false, exporting: false, objectUrl: null };
+const video = document.createElement('video');
+video.playsInline = true;
+video.preload = 'auto';
+const canvas = $('canvas');
+const ctx = canvas.getContext('2d');
+
+for (const [key, p] of Object.entries(PRESETS)) $('cPreset').add(new Option(p.label, key));
+for (const f of FONTS) $('cFont').add(new Option(f, f));
+
+function setStatus(msg, isError) {
+  const el = $('status');
+  el.textContent = msg;
+  el.style.color = isError ? '#fca5a5' : '';
+}
+function fmt(t) {
+  const s = Math.max(0, t);
+  return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`;
+}
+function fontSpec(family, weight, px) {
+  return `${weight || 400} ${px}px "${family}"`;
+}
+function captionFont(c) {
+  const p = PRESETS[c.preset] || PRESETS.sticker;
+  return { family: c.font || p.font, weight: p.weight || FONT_WEIGHTS[c.font] || 400 };
+}
+function loadFonts() {
+  const families = FONTS.concat(INDIC_FONTS.map(f => f.family));
+  return Promise.all(families.map(f => document.fonts.load(fontSpec(f, 800, 40)).catch(() => {}))).then(() => {});
+}
+
+function splitEvenWords(text, start, end) {
+  const parts = text.split(/\s+/).filter(Boolean);
+  if (!parts.length) return [];
+  const step = (end - start) / parts.length;
+  return parts.map((w, i) => ({ word: w, start: start + i * step, end: start + (i + 1) * step }));
+}
+function newCaption(start, end, text, words) {
+  return { id: state.nextId++, start, end, text, preset: 'sticker', font: null, size: 'M', color: null, words: words || null };
+}
+function captionsFromSegments(segments) {
+  const out = [];
+  for (const seg of segments) {
+    const hasTiming = seg.words && seg.words.length && seg.words.every(w => w.end > w.start);
+    const words = hasTiming ? seg.words : splitEvenWords(seg.text, seg.start, seg.end);
+    let group = [];
+    const flush = () => {
+      if (!group.length) return;
+      const start = group[0].start;
+      const end = Math.max(group[group.length - 1].end, start + 0.5);
+      out.push(newCaption(start, end, group.map(w => w.word).join(' '), group.map(w => ({ word: w.word, start: w.start, end: w.end }))));
+      group = [];
+    };
+    words.forEach(w => {
+      const prev = group[group.length - 1];
+      if (prev && (group.length >= 4 || w.start - prev.end > 0.5)) flush();
+      group.push(w);
+    });
+    flush();
+  }
+  out.sort((a, b) => a.start - b.start);
+  for (let i = 0; i < out.length - 1; i++) out[i].end = Math.min(out[i].end, out[i + 1].start);
+  return out.filter(c => c.end > c.start);
+}
+
+const isEmphasis = (word, i) => /\d/.test(word) || word.replace(/[^\p{L}]/gu, '').length >= 6 || /[!?]$/.test(word) || i === 0;
+
+function layoutTokens(c, p, H) {
+  const { family, weight } = captionFont(c);
+  const base = Math.round(H * 0.055 * (p.size || 1) * (SIZE_MUL[c.size] || 1));
+  const fill = c.color || p.fill;
+  const raw = c.words && c.words.length ? c.words : splitEvenWords(c.text, c.start, c.end);
+  let paletteIndex = 0;
+  return raw.map((w, i) => {
+    const em = p.emph && isEmphasis(w.word, i) ? p.emph : null;
+    const isSmall = p.emph && !em && w.word.replace(/[^\p{L}\p{N}]/gu, '').length <= 3;
+    const px = em ? Math.round(base * em.sz) : isSmall ? Math.round(base * 0.8) : base;
+    const upper = em && em.upper !== undefined ? em.upper : !!p.upper;
+    const indic = indicFamily(w.word);
+    ctx.font = indic
+      ? fontSpec(indic, 800, px)
+      : fontSpec(em ? em.font : family, em ? (em.weight || 400) : weight, px);
+    const text = upper ? w.word.toUpperCase() : w.word;
+    const color = em && em.palette ? em.palette[paletteIndex++ % em.palette.length] : fill;
+    const rot = em ? ((i * 7) % 5 - 2) * 0.035 : 0;
+    return { text, start: w.start, end: w.end, font: ctx.font, px, color, rot, w: ctx.measureText(text).width, gap: 0 };
+  });
+}
+
+function wrapTokens(tokens, maxW) {
+  const lines = [];
+  let line = [], lineW = 0;
+  for (const tk of tokens) {
+    ctx.font = tk.font;
+    const gap = ctx.measureText(' ').width;
+    if (line.length && lineW + gap + tk.w > maxW) { lines.push({ tokens: line, width: lineW }); line = []; lineW = 0; }
+    tk.gap = line.length ? gap : 0;
+    lineW += tk.gap + tk.w;
+    line.push(tk);
+  }
+  if (line.length) lines.push({ tokens: line, width: lineW });
+  return lines;
+}
+
+function roundRectPath(x, y, w, h, r) {
+  ctx.beginPath();
+  if (ctx.roundRect) ctx.roundRect(x, y, w, h, r); else ctx.rect(x, y, w, h);
+}
+
+function drawPlate(plate, x, y, w, h, px) {
+  const r = px * 0.18;
+  ctx.save();
+  if (plate.kind === 'strip') {
+    ctx.fillStyle = plate.fill;
+    ctx.fillRect(0, y, canvas.width, h);
+    ctx.fillStyle = plate.bar;
+    ctx.fillRect(0, y, px * 0.14, h);
+  } else if (plate.kind === 'sticker') {
+    ctx.fillStyle = 'rgba(0,0,0,0.85)';
+    roundRectPath(x + px * 0.1, y + px * 0.12, w, h, r);
+    ctx.fill();
+    ctx.fillStyle = plate.fill;
+    roundRectPath(x, y, w, h, r);
+    ctx.fill();
+    ctx.lineWidth = px * 0.08;
+    ctx.strokeStyle = plate.border;
+    ctx.stroke();
+  } else if (plate.kind === 'gradient') {
+    const g = ctx.createLinearGradient(x, 0, x + w, 0);
+    g.addColorStop(0, '#FF2BD6');
+    g.addColorStop(1, '#FF8A00');
+    ctx.fillStyle = g;
+    roundRectPath(x, y, w, h, h / 2);
+    ctx.fill();
+  } else {
+    ctx.fillStyle = plate.fill || 'rgba(0,0,0,0.6)';
+    roundRectPath(x, y, w, h, r);
+    ctx.fill();
+  }
+  ctx.restore();
+}
+
+function drawCaptionFrame(t) {
+  const W = canvas.width, H = canvas.height;
+  const c = state.captions.find(x => t >= x.start && t < x.end);
+  if (!c) return;
+  const p = PRESETS[c.preset] || PRESETS.sticker;
+  const tokens = layoutTokens(c, p, H);
+  const lines = wrapTokens(tokens, W * 0.84);
+  const lineHs = lines.map(l => Math.max(...l.tokens.map(k => k.px)) * 1.2);
+  const blockH = lineHs.reduce((a, b) => a + b, 0);
+  const cy = H * 0.74;
+
+  ctx.save();
+  ctx.translate(W / 2, cy);
+  ctx.rotate(p.plate && p.plate.tilt ? p.plate.tilt : 0);
+  ctx.translate(-W / 2, -cy);
+  ctx.textBaseline = 'middle';
+  ctx.textAlign = 'center';
+
+  const layout = [];
+  let top = cy - blockH / 2;
+  lines.forEach((line, li) => {
+    const lh = lineHs[li];
+    const maxPx = Math.max(...line.tokens.map(k => k.px));
+    layout.push({ line, lh, mid: top + lh / 2, maxPx, x: (W - line.width) / 2 });
+    top += lh;
+  });
+
+  const plate = p.plate;
+  if (plate) {
+    layout.forEach(l => {
+      const padX = l.maxPx * 0.35;
+      const y = l.mid - l.lh / 2 + l.lh * 0.08;
+      const h = l.lh * 0.84;
+      if (plate.kind === 'strip') drawPlate(plate, 0, y, W, h, l.maxPx);
+      else drawPlate(plate, l.x - padX, y, l.line.width + padX * 2, h, l.maxPx);
+    });
+  }
+
+  layout.forEach(l => {
+    let x = l.x;
+    l.line.tokens.forEach(tk => {
+      x += tk.gap;
+      ctx.save();
+      ctx.translate(x + tk.w / 2, l.mid);
+      ctx.rotate(tk.rot);
+      ctx.font = tk.font;
+      if (p.stroke) {
+        ctx.lineWidth = tk.px * 0.14;
+        ctx.lineJoin = 'round';
+        ctx.strokeStyle = p.stroke;
+        ctx.strokeText(tk.text, 0, 0);
+      }
+      ctx.fillStyle = tk.color;
+      ctx.fillText(tk.text, 0, 0);
+      ctx.restore();
+      x += tk.w;
+    });
+  });
+  ctx.restore();
+}
+
+function renderFrame() {
+  const ready = video.readyState >= 2;
+  if (ready) ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  else { ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height); }
+  drawCaptionFrame(video.currentTime);
+}
+function renderLoop() {
+  if (!state.playing) return;
+  renderFrame();
+  updatePlayhead();
+  requestAnimationFrame(renderLoop);
+}
+
+function updatePlayhead() {
+  $('playhead').style.left = (video.currentTime * state.pps) + 'px';
+  $('timeLabel').textContent = `${fmt(video.currentTime)} / ${fmt(state.duration)}`;
+  $('playBtn').textContent = state.playing ? '❚❚ Pause' : '▶ Play';
+}
+
+function setPlaying(on) {
+  state.playing = on;
+  if (on) { video.play().catch(() => setPlaying(false)); requestAnimationFrame(renderLoop); }
+  else video.pause();
+  updatePlayhead();
+  if (!on) renderFrame();
+}
+
+function seek(t) {
+  video.currentTime = Math.max(0, Math.min(state.duration, t));
+  video.addEventListener('seeked', () => { renderFrame(); updatePlayhead(); }, { once: true });
+  renderFrame();
+  updatePlayhead();
+}
+
+function setCanvasSize() {
+  const scale = Math.min(1, EXPORT_MAX_DIM / Math.max(state.videoW, state.videoH));
+  canvas.width = Math.round(state.videoW * scale / 2) * 2;
+  canvas.height = Math.round(state.videoH * scale / 2) * 2;
+  $('stage').style.aspectRatio = `${canvas.width} / ${canvas.height}`;
+}
+
+function setEnabled(on) {
+  $('playBtn').disabled = !on;
+  $('addBtn').disabled = !on;
+  $('exportBtn').disabled = !on;
+}
+
+function renderRuler() {
+  const ruler = $('ruler');
+  ruler.innerHTML = '';
+  const step = state.pps >= 60 ? 1 : state.pps >= 25 ? 2 : 5;
+  for (let s = 0; s <= state.duration + 0.001; s += step) {
+    const tick = document.createElement('div');
+    tick.className = 'cap-tick';
+    tick.style.left = (s * state.pps) + 'px';
+    tick.textContent = fmt(s);
+    ruler.appendChild(tick);
+  }
+}
+
+function renderTimeline() {
+  const width = Math.max(state.duration * state.pps + 40, $('timeline').clientWidth);
+  $('tlInner').style.width = width + 'px';
+  renderRuler();
+  const track = $('track');
+  track.innerHTML = '';
+  for (const c of state.captions) {
+    const el = document.createElement('div');
+    el.className = 'cap-block' + (c.id === state.selectedId ? ' sel' : '');
+    el.dataset.id = c.id;
+    el.style.left = (c.start * state.pps) + 'px';
+    el.style.width = Math.max(8, (c.end - c.start) * state.pps) + 'px';
+    el.style.background = c.id === state.selectedId ? '#fafafa' : '#27272a';
+    el.style.color = c.id === state.selectedId ? '#0a0a0a' : '#fafafa';
+    el.title = c.text;
+    el.innerHTML = `<span class="h l" data-edge="start"></span>${escapeHtml(c.text)}<span class="h r" data-edge="end"></span>`;
+    track.appendChild(el);
+  }
+  $('countLabel').textContent = state.captions.length ? `${state.captions.length} caption${state.captions.length === 1 ? '' : 's'}` : 'No captions yet';
+  updatePlayhead();
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, ch => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
+}
+
+function selectCaption(id) {
+  state.selectedId = id;
+  const c = state.captions.find(x => x.id === id);
+  $('editor').classList.toggle('cap-disabled', !c);
+  $('inspectorHint').textContent = c ? 'Editing the selected caption. Changes update the preview right away.' : 'Select a caption on the timeline to edit its text, timing and style.';
+  if (c) {
+    $('cText').value = c.text;
+    $('cStart').value = c.start.toFixed(2);
+    $('cEnd').value = c.end.toFixed(2);
+    $('cPreset').value = c.preset;
+    $('cFont').value = c.font || PRESETS[c.preset].font;
+    $('cSize').value = c.size;
+    $('cColor').value = c.color || PRESETS[c.preset].fill.toLowerCase();
+  }
+  renderTimeline();
+  if (c) seek(c.start);
+}
+
+function updateSelected(patch) {
+  const c = state.captions.find(x => x.id === state.selectedId);
+  if (!c) return;
+  Object.assign(c, patch);
+  renderTimeline();
+  renderFrame();
+}
+
+function bindEditor() {
+  $('cText').addEventListener('input', e => { updateSelected({ text: e.target.value, words: null }); });
+  const timeInput = (key) => (e) => {
+    const c = state.captions.find(x => x.id === state.selectedId);
+    if (!c) return;
+    let v = Math.max(0, Math.min(state.duration, Number(e.target.value)));
+    if (!Number.isFinite(v)) return;
+    if (key === 'start') v = Math.min(v, c.end - 0.2);
+    else v = Math.max(v, c.start + 0.2);
+    updateSelected({ [key]: v });
+    e.target.value = v.toFixed(2);
+  };
+  $('cStart').addEventListener('change', timeInput('start'));
+  $('cEnd').addEventListener('change', timeInput('end'));
+  $('cPreset').addEventListener('change', e => { updateSelected({ preset: e.target.value, color: null }); selectCaption(state.selectedId); });
+  $('cFont').addEventListener('change', e => updateSelected({ font: e.target.value }));
+  $('cSize').addEventListener('change', e => updateSelected({ size: e.target.value }));
+  $('cColor').addEventListener('input', e => updateSelected({ color: e.target.value }));
+  $('cColorReset').addEventListener('click', () => { updateSelected({ color: null }); selectCaption(state.selectedId); });
+  $('applyAllBtn').addEventListener('click', () => {
+    const c = state.captions.find(x => x.id === state.selectedId);
+    if (!c) return;
+    state.captions.forEach(x => Object.assign(x, { preset: c.preset, font: c.font, size: c.size, color: c.color }));
+    renderTimeline(); renderFrame();
+    setStatus('Applied this look to all captions.');
+  });
+  $('deleteBtn').addEventListener('click', () => {
+    state.captions = state.captions.filter(x => x.id !== state.selectedId);
+    selectCaption(null);
+    renderFrame();
+  });
+  $('addBtn').addEventListener('click', () => {
+    const start = Math.min(video.currentTime, Math.max(0, state.duration - 0.5));
+    const end = Math.min(state.duration, start + 2);
+    const c = newCaption(start, Math.max(end, start + 0.5), 'Your caption');
+    c.words = null;
+    state.captions.push(c);
+    state.captions.sort((a, b) => a.start - b.start);
+    selectCaption(c.id);
+  });
+}
+
+function bindTimeline() {
+  const track = $('track');
+  const ruler = $('ruler');
+  const pxToTime = (clientX) => {
+    const rect = $('tlInner').getBoundingClientRect();
+    return (clientX - rect.left) / state.pps;
+  };
+  ruler.addEventListener('click', e => seek(pxToTime(e.clientX)));
+  track.addEventListener('click', e => {
+    if (e.target === track) seek(pxToTime(e.clientX));
+  });
+  track.addEventListener('pointerdown', e => {
+    const el = e.target.closest('.cap-block');
+    if (!el) return;
+    const id = Number(el.dataset.id);
+    const c = state.captions.find(x => x.id === id);
+    if (!c) return;
+    const edge = e.target.dataset.edge || 'move';
+    const startX = e.clientX;
+    const orig = { start: c.start, end: c.end };
+    const origWords = c.words ? c.words.map(w => ({ ...w })) : null;
+    if (state.selectedId !== id) selectCaption(id);
+    const move = (ev) => {
+      const dt = (ev.clientX - startX) / state.pps;
+      if (edge === 'move') {
+        const len = orig.end - orig.start;
+        const s = Math.max(0, Math.min(state.duration - len, orig.start + dt));
+        const shift = s - orig.start;
+        c.start = s; c.end = s + len;
+        if (origWords) c.words = origWords.map(w => ({ word: w.word, start: w.start + shift, end: w.end + shift }));
+      } else if (edge === 'start') {
+        c.start = Math.max(0, Math.min(orig.end - 0.2, orig.start + dt));
+        c.words = null;
+      } else {
+        c.end = Math.min(state.duration, Math.max(orig.start + 0.2, orig.end + dt));
+        c.words = null;
+      }
+      renderTimeline();
+    };
+    const up = () => {
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+      selectCaption(id);
+      renderFrame();
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+    e.preventDefault();
+  });
+  $('zoom').addEventListener('input', e => {
+    state.pps = Number(e.target.value);
+    renderTimeline();
+  });
+  window.addEventListener('resize', renderTimeline);
+}
+
+async function decodeToWav16k(file) {
+  const buf = await file.arrayBuffer();
+  const AC = window.AudioContext || window.webkitAudioContext;
+  const ac = new AC();
+  let audio;
+  try { audio = await ac.decodeAudioData(buf); }
+  finally { ac.close(); }
+  const rate = 16000;
+  const off = new OfflineAudioContext(1, Math.max(1, Math.ceil(audio.duration * rate)), rate);
+  const src = off.createBufferSource();
+  src.buffer = audio;
+  src.connect(off.destination);
+  src.start();
+  const rendered = await off.startRendering();
+  return encodeWav(rendered.getChannelData(0), rate);
+}
+function encodeWav(samples, rate) {
+  const dataLen = samples.length * 2;
+  const view = new DataView(new ArrayBuffer(44 + dataLen));
+  const writeStr = (off, s) => { for (let i = 0; i < s.length; i++) view.setUint8(off + i, s.charCodeAt(i)); };
+  writeStr(0, 'RIFF'); view.setUint32(4, 36 + dataLen, true); writeStr(8, 'WAVE');
+  writeStr(12, 'fmt '); view.setUint32(16, 16, true); view.setUint16(20, 1, true); view.setUint16(22, 1, true);
+  view.setUint32(24, rate, true); view.setUint32(28, rate * 2, true); view.setUint16(32, 2, true); view.setUint16(34, 16, true);
+  writeStr(36, 'data'); view.setUint32(40, dataLen, true);
+  let off = 44;
+  for (let i = 0; i < samples.length; i++, off += 2) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(off, s < 0 ? s * 0x8000 : s * 0x7fff, true);
+  }
+  return new Uint8Array(view.buffer);
+}
+function bytesToBase64(bytes) {
+  let bin = '';
+  const CH = 0x8000;
+  for (let i = 0; i < bytes.length; i += CH) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + CH));
+  return btoa(bin);
+}
+
+// Eases the loader from `from` toward `to` while a slow step runs. Callers clear the returned timer.
+function creepTo(from, to, text) {
+  let p = from;
+  VyomLoader.set(p, text);
+  return setInterval(() => { p += (to - p) * 0.04; VyomLoader.set(p); }, 300);
+}
+
+async function autoCaption(file) {
+  const language = $('captionLang').value;
+  VyomLoader.show('Generating captions');
+  setStatus('Extracting speech from your video…');
+  let timer = creepTo(0, 28, 'Extracting speech from your video…');
+  let wav;
+  try { wav = await decodeToWav16k(file); }
+  catch {
+    clearInterval(timer);
+    VyomLoader.hide();
+    setStatus('Could not read the audio in this file. Add captions manually with “+ Caption at playhead”.', true);
+    return;
+  }
+  clearInterval(timer);
+  setStatus('Transcribing speech with Whisper… this takes a few seconds.');
+  const transcribeText = language === 'en' ? 'Transcribing speech…' : 'Transcribing and translating speech…';
+  timer = creepTo(30, 92, transcribeText);
+  let data;
+  try {
+    const res = await fetch('/api/captions', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ audio: bytesToBase64(wav), language }) });
+    data = await res.json().catch(() => ({}));
+    if (!res.ok) throw new Error(data.error || 'Transcription failed.');
+  } catch (err) {
+    clearInterval(timer);
+    VyomLoader.hide();
+    setStatus(`${err.message} You can still add captions manually.`, true);
+    return;
+  }
+  clearInterval(timer);
+  VyomLoader.set(100, 'Captions ready');
+  await new Promise(r => setTimeout(r, 600));
+  VyomLoader.hide();
+  const caps = captionsFromSegments(data.segments || []);
+  state.captions = caps;
+  renderTimeline();
+  renderFrame();
+  setStatus(caps.length ? `Auto-captioned ${caps.length} lines. Click any caption to restyle it.` : 'No speech detected. Add captions manually with “+ Caption at playhead”.');
+}
+
+async function loadVideo(file) {
+  if (!file) return;
+  if (!file.type.startsWith('video/') && !/\.(mp4|mov|webm|m4v)$/i.test(file.name)) { setStatus('Please choose a video file.', true); return; }
+  if (file.size > MAX_BYTES) { setStatus('This file is over 300 MB. Try a shorter or smaller export.', true); return; }
+  setPlaying(false);
+  if (state.objectUrl) URL.revokeObjectURL(state.objectUrl);
+  state.objectUrl = URL.createObjectURL(file);
+  video.src = state.objectUrl;
+  await new Promise((resolve, reject) => {
+    video.onloadedmetadata = resolve;
+    video.onerror = () => reject(new Error('Could not open this video.'));
+  }).catch(err => { setStatus(err.message, true); throw err; });
+  state.duration = video.duration;
+  state.videoW = video.videoWidth;
+  state.videoH = video.videoHeight;
+  setCanvasSize();
+  $('stageEmpty').style.display = 'none';
+  state.captions = [];
+  state.pps = Number($('zoom').value);
+  selectCaption(null);
+  setEnabled(true);
+  renderFrame();
+  renderTimeline();
+  updatePlayhead();
+  if (state.duration > MAX_AUTO_SECONDS) {
+    setStatus('Auto-captions work on clips up to 5 minutes. Add captions manually with “+ Caption at playhead”.');
+  } else {
+    await autoCaption(file);
+  }
+}
+
+function pickMime() {
+  const options = ['video/mp4;codecs=avc1.42E01E,mp4a.40.2', 'video/mp4', 'video/webm;codecs=vp9,opus', 'video/webm'];
+  return options.find(o => MediaRecorder.isTypeSupported(o)) || '';
+}
+
+async function exportVideo(pickerPromise) {
+  if (state.exporting || !state.duration) return;
+  if (!window.MediaRecorder || !canvas.captureStream) {
+    setStatus('Your browser cannot record canvas video. Try Chrome, Edge or Safari.', true);
+    return;
+  }
+  state.exporting = true;
+  let writable = null;
+  if (pickerPromise) {
+    try {
+      writable = await (await pickerPromise).createWritable();
+    } catch (err) {
+      state.exporting = false;
+      if (err.name === 'AbortError') return;
+      throw err;
+    }
+  }
+  setPlaying(false);
+  $('exportBtn').disabled = true;
+  $('exportResult').innerHTML = '';
+  VyomLoader.show('Exporting video');
+  VyomLoader.set(0, 'Rendering captions… keep this tab open.');
+  $('exportStatus').textContent = 'Rendering captions… keep this tab open.';
+
+  const stream = canvas.captureStream(30);
+  try {
+    const audioStream = video.captureStream ? video.captureStream() : null;
+    if (audioStream) audioStream.getAudioTracks().forEach(t => stream.addTrack(t));
+  } catch { /* video without audio capture: export stays silent */ }
+  const mimeType = pickMime();
+  const recorder = new MediaRecorder(stream, { mimeType: mimeType || undefined, videoBitsPerSecond: 6000000 });
+  const chunks = [];
+  let writeChain = Promise.resolve();
+  recorder.ondataavailable = e => {
+    if (!e.data || !e.data.size) return;
+    if (writable) writeChain = writeChain.then(() => writable.write(e.data));
+    else chunks.push(e.data);
+  };
+  const done = new Promise(resolve => { recorder.onstop = resolve; });
+
+  if (video.currentTime > 0) {
+    const sought = new Promise(r => video.addEventListener('seeked', r, { once: true }));
+    video.currentTime = 0;
+    await sought;
+  }
+  recorder.start(250);
+  const ended = new Promise(resolve => video.addEventListener('ended', resolve, { once: true }));
+  await video.play();
+  const frame = () => {
+    if (!state.exporting) return;
+    renderFrame();
+    VyomLoader.set(Math.min(94, (video.currentTime / state.duration) * 94), 'Rendering captions… keep this tab open.');
+    if (!video.ended) requestAnimationFrame(frame);
+  };
+  requestAnimationFrame(frame);
+  await ended;
+  renderFrame();
+  recorder.stop();
+  await done;
+  VyomLoader.set(97, 'Preparing file…');
+  stream.getTracks().forEach(t => t.stop());
+  state.exporting = false;
+  $('exportBtn').disabled = false;
+  const type = recorder.mimeType || mimeType || 'video/webm';
+  const ext = type.includes('mp4') ? 'mp4' : 'webm';
+  if (writable) {
+    await writeChain;
+    await writable.close();
+    VyomLoader.set(100, 'Saved to your computer');
+    $('exportStatus').textContent = 'Done! Your captioned video was saved.';
+    await new Promise(r => setTimeout(r, 1500));
+    VyomLoader.hide();
+    return;
+  }
+  const blob = new Blob(chunks, { type });
+  const url = URL.createObjectURL(blob);
+  const base = ($('videoFile').files[0]?.name || 'video').replace(/\.[^.]+$/, '');
+  const filename = `${base}-captioned.${ext}`;
+  $('exportStatus').textContent = 'Done! Your captioned video is downloading.';
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  $('exportResult').innerHTML = `<a class="btn" style="display:inline-block;width:auto;margin-top:10px;text-decoration:none" download="${escapeHtml(filename)}" href="${url}">⇩ Download ${ext.toUpperCase()} again</a>`;
+  // Browsers don't report when a blob download finishes, so the loader closes once the save is handed to the browser.
+  VyomLoader.set(100, 'Download started');
+  await new Promise(r => setTimeout(r, 1500));
+  VyomLoader.hide();
+}
+
+$('exportBtn').addEventListener('click', () => {
+  if (state.exporting || !state.duration) return;
+  // Open the save picker synchronously so the browser accepts it as a user gesture.
+  let pickerPromise = null;
+  if (window.showSaveFilePicker) {
+    const ext = (pickMime() || '').includes('mp4') ? 'mp4' : 'webm';
+    const base = ($('videoFile').files[0]?.name || 'video').replace(/\.[^.]+$/, '');
+    pickerPromise = window.showSaveFilePicker({
+      suggestedName: `${base}-captioned.${ext}`,
+      types: [{ description: 'Video', accept: { [ext === 'mp4' ? 'video/mp4' : 'video/webm']: [`.${ext}`] } }]
+    });
+    pickerPromise.catch(() => {});
+  }
+  exportVideo(pickerPromise).catch(err => {
+    VyomLoader.hide();
+    state.exporting = false;
+    $('exportBtn').disabled = false;
+    $('exportStatus').textContent = '';
+    setStatus(`Export failed: ${err.message || 'unknown error'}. Try again.`, true);
+  });
+});
+
+$('videoFile').addEventListener('change', e => loadVideo(e.target.files[0]).catch(() => {}));
+const drop = $('drop');
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, e => { e.preventDefault(); drop.classList.remove('over'); }));
+drop.addEventListener('drop', e => { const f = e.dataTransfer.files[0]; if (f) loadVideo(f).catch(() => {}); });
+$('playBtn').addEventListener('click', () => {
+  if (video.ended) seek(0);
+  setPlaying(!state.playing);
+});
+video.addEventListener('ended', () => setPlaying(false));
+bindEditor();
+bindTimeline();
+loadFonts().then(() => renderFrame());
+renderFrame();
+</script>
+<script src="chat-widget.js" defer></script></body>
+</html>

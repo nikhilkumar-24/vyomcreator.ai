@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#0a0a0a">
+<title>Free SFX Library for Reels | vyom.ai</title>
+<meta name="description" content="Browse a free sound-effect library for reels and short videos: whooshes, pings, transitions and more, ready to add to your edit.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://www.vyomcreator.ai/sfx">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="vyom.ai">
+<meta property="og:title" content="Free SFX Library for Reels | vyom.ai">
+<meta property="og:description" content="Free sound effects for reels and short videos.">
+<meta property="og:url" content="https://www.vyomcreator.ai/sfx">
+<meta property="og:image" content="https://www.vyomcreator.ai/vyom-main.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Free SFX Library for Reels | vyom.ai">
+<meta name="twitter:description" content="Free sound effects for reels and short videos.">
+<meta name="twitter:image" content="https://www.vyomcreator.ai/vyom-main.png">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"><link rel="stylesheet" href="app.css"></head>
+<body><main class="wrap">
+<header class="nav"><nav class="nav-links nav-left"><a href="/" class="navlink">Home</a><a href="/hooks" class="navlink">Hooks</a></nav><div class="brand"><a href="/" class="vyom-logo" aria-label="VYOM Creator AI home"><span class="vyom-logo-word">VYOM<i class="vyom-logo-star">✦</i></span><span class="vyom-logo-sub">Creator AI</span></a></div><div class="nav-end"><nav class="nav-links"><a href="/sfx" class="navlink active">SFX</a><a href="/beatline" class="navlink">Beatline</a><a href="/captions" class="navlink">Captions</a></nav><div class="pill">✦ CREATOR GROWTH LAB · BETA</div></div></header>
+<section class="hero"><div><div class="eyebrow">Free sound effects</div><h1>SFX <span class="grad">library.</span></h1><p>Preview and download bite-sized sound effects pulled from the vyom.ai bundle. Each clip is ready to drop straight into your reels.</p></div></section>
+<section class="panel"><h2>All sound effects</h2><p class="sub">Click play to preview, or download the MP3 directly to your device. Each tile is auto-tagged from its waveform/spectrum, with a few similar free SFX you can grab elsewhere.</p><div class="sfx-grid" id="sfxGrid"></div></section>
+<footer class="footer">VYOM.AI · Built for creators · AI features require Cloudflare Workers AI enabled on your account.</footer></main>
+<script src="sfx-data.js"></script>
+<script>
+function escapeHtml(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+document.getElementById('sfxGrid').innerHTML = SFX_LIBRARY.map(s=>{
+  const mp3 = `sfx-bundle-collection/${s.id}.mp3`;
+  const thumb = `sfx-bundle-collection/thumbnails/${s.id}.png`;
+  const idLabel = s.id.replace('sfx-','SFX ');
+  const similar = similarSfxLinks(s.tag, s.mixTag).map(l=>`<a href="${l.url}" target="_blank" rel="noopener noreferrer">${escapeHtml(l.name)}</a>`).join('');
+  return `<div class="sfx-card"><img class="sfx-thumb" src="${thumb}" alt="${escapeHtml(s.label)} waveform" loading="lazy"><div class="sfx-card-body"><div class="sfx-card-title">${escapeHtml(s.label)}</div><div class="sfx-card-meta">${idLabel} · ${escapeHtml(s.duration)} · ${escapeHtml(s.size)}</div><audio class="sfx-audio" controls preload="none" src="${mp3}"></audio><a class="sfx-download" href="${mp3}" download="${s.id}.mp3">⇩ Download MP3</a><div class="sfx-similar"><div class="sfx-similar-label">Similar SFX you can download:</div><div class="sfx-similar-links">${similar}</div></div></div></div>`;
+}).join('');
+</script><script src="chat-widget.js" defer></script></body></html>
