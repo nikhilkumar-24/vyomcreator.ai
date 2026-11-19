@@ -8,6 +8,7 @@
       "retailers": [
         {
           "name": "MuscleBlaze",
+          "logo": "logos/muscleblaze.svg",
           "color": "#e11d48",
           "price": 3999,
           "mrp": 4999,
@@ -16,6 +17,7 @@
         },
         {
           "name": "Amazon",
+          "logo": "logos/amazon.ico",
           "color": "#f59e0b",
           "price": 3899,
           "mrp": 4999,
@@ -24,6 +26,7 @@
         },
         {
           "name": "HealthKart",
+          "logo": "logos/healthkart.svg",
           "color": "#16a34a",
           "price": 3749,
           "mrp": 4999,
@@ -40,6 +43,7 @@
         },
         {
           "name": "Zepto",
+          "logo": "logos/zepto.svg",
           "color": "#7c3aed",
           "price": null,
           "mrp": null,
@@ -47,6 +51,7 @@
         },
         {
           "name": "Swiggy Instamart",
+          "logo": "logos/swiggy-instamart.svg",
           "color": "#f97316",
           "price": 3599,
           "mrp": 4999,

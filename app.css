@@ -33,26 +33,23 @@ a { color: inherit; }
 }
 
 .nav {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 16px;
-  height: 56px;
-  padding: 0 24px;
+  gap: 14px;
+  padding: 16px 24px 14px;
   margin-bottom: 40px;
   border-bottom: 1px solid #1a1a1a;
 }
 
-.brand { display: flex; align-items: center; justify-content: center; grid-column: 2; }
+.brand { display: flex; align-items: center; justify-content: center; }
+.nav-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px; }
 .vyom-logo { display: inline-flex; flex-direction: column; align-items: flex-start; color: #fafafa; text-decoration: none; line-height: 1; }
 .vyom-logo-word { position: relative; font: italic 800 26px/1 Inter, system-ui, sans-serif; letter-spacing: .14em; }
 .vyom-logo-word::after { content: ""; position: absolute; left: -4px; right: -10px; bottom: -7px; height: 2px; background: linear-gradient(90deg, transparent, #fafafa 25%, #fafafa 85%, transparent); transform: rotate(-5deg); transform-origin: left center; }
 .vyom-logo-star { position: absolute; top: -6px; right: -12px; font-size: 9px; font-style: normal; }
 .vyom-logo-sub { margin-top: 9px; font: 600 10px/1 Inter, system-ui, sans-serif; letter-spacing: .34em; text-transform: uppercase; color: #a1a1aa; }
-.nav-links { display: flex; gap: 6px; align-items: center; }
-.nav-left { grid-column: 1; justify-self: start; }
-.nav-end { grid-column: 3; justify-self: end; display: flex; align-items: center; gap: 12px; }
-.nav-end .nav-links { gap: 2px; }
+.nav-links { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; justify-content: center; }
 .navlink {
   color: var(--muted);
   text-decoration: none;
@@ -431,9 +428,7 @@ a { color: inherit; }
 @media (max-width: 850px) {
   .hero, .layout { grid-template-columns: 1fr; }
   .hero { gap: 18px; margin-bottom: 20px; }
-  .nav { grid-template-columns: 1fr; justify-items: center; height: auto; margin-bottom: 24px; padding: 12px 16px; }
-  .brand { order: -1; grid-column: 1; }
-  .nav-left, .nav-end { grid-column: 1; justify-self: center; flex-wrap: wrap; justify-content: center; }
+  .nav { margin-bottom: 24px; padding: 12px 16px; }
   .wrap { padding: 18px 16px 40px; }
 }
 @media (max-width: 480px) {
