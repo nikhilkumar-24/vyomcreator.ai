@@ -369,7 +369,10 @@ body.landing .lp-lede {
 @media (min-width: 1024px) { .lp-tools { grid-template-columns: repeat(4, 1fr); gap: 24px; } }
 
 /* Languages */
-.lp-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
+.lp-lang-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 28px; }
+.lp-lang { display: flex; flex-direction: column; gap: 4px; padding: 14px 16px; border: 1px solid #27272a; border-radius: 12px; background: #111111; }
+.lp-lang strong { font-size: 15px; font-weight: 600; color: #fafafa; }
+.lp-lang small { font-size: 12px; color: #71717a; }
 .lp-chip {
   padding: 10px 18px;
   border: 1px solid #27272a;
