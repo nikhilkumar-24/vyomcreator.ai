@@ -1,6 +1,8 @@
 const MUSCLEBLAZE_ORIGIN = 'https://www.muscleblaze.com';
 const HEALTHKART_ORIGIN = 'https://www.healthkart.com';
 const CACHE_SECONDS = 3600;
+// Bump when the response shape changes so stale cached searches are not served.
+const CACHE_VERSION = 2;
 const MAX_SUGGESTIONS = 8;
 
 const clean = (s) => (typeof s === 'string' ? s.replace(/\s+/g, ' ').trim() : '');
@@ -74,7 +76,7 @@ export async function onRequestGet({ request }) {
   }
 
   const cache = caches.default;
-  const cacheKey = new Request(url.origin + '/api/search?q=' + encodeURIComponent(q.toLowerCase()));
+  const cacheKey = new Request(url.origin + '/api/search?v=' + CACHE_VERSION + '&q=' + encodeURIComponent(q.toLowerCase()));
   const cached = await cache.match(cacheKey);
   if (cached) return cached;
 
