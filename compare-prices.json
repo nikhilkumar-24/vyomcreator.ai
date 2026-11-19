@@ -1,5 +1,6 @@
 {
   "lastUpdated": "2026-11-19",
+  "_comment": "Prices are the listed selling price found on each store's product page. They may already include or exclude store discount codes, coupons, bank offers, delivery fees and location-based pricing, so the final checkout price can differ. Each url points to the product page; a search link is used only where no product page was found.",
   "products": [
     {
       "id": "muscleblaze-biozyme-whey-rich-chocolate-1kg",
@@ -22,7 +23,7 @@
           "price": 3899,
           "mrp": 4999,
           "note": "Amazon.in listing, seen 18 Nov 2026",
-          "url": "https://www.amazon.in/s?k=muscleblaze+biozyme+performance+whey+rich+chocolate+1kg"
+          "url": "https://www.amazon.in/MuscleBlaze-Biozyme-Performance-Protein-Powder/dp/B0GNS675V8"
         },
         {
           "name": "HealthKart",
@@ -30,16 +31,16 @@
           "color": "#16a34a",
           "price": 3749,
           "mrp": 4999,
-          "note": "HealthKart 2.2 lb listing, seen 18 Nov 2026. Check the flavour before buying.",
-          "url": "https://www.healthkart.com/search?q=muscleblaze+biozyme+performance+whey"
+          "note": "Biozyme Whey PR (with creatine), Chocolate Fudge 2.2 lb, seen 18 Nov 2026. Not the same blend as Performance Whey.",
+          "url": "https://www.healthkart.com/sv/muscleblaze-biozyme-whey-pr/SP-121273"
         },
         {
           "name": "Blinkit",
           "color": "#facc15",
-          "price": 3999,
+          "price": 4199,
           "mrp": 4999,
-          "note": "Delhi listing, 7 Oct 2026 (Rozmo). Price varies by location; may be out of date.",
-          "url": "https://blinkit.com/s/?q=muscleblaze%20biozyme%20whey"
+          "note": "Rich Chocolate 1 kg listing, seen 23 Oct 2026. Price varies by location; may be out of date.",
+          "url": "https://blinkit.com/prn/muscleblaze-biozyme-performance-whey-protein-powder-1-kg/prid/491874"
         },
         {
           "name": "Zepto",
@@ -56,7 +57,7 @@
           "price": 3599,
           "mrp": 4999,
           "note": "Delhi listing, 7 Oct 2026 (Rozmo). Price varies by location; may be out of date.",
-          "url": "https://www.swiggy.com/instamart/search?query=muscleblaze%20biozyme%20whey"
+          "url": "https://www.swiggy.com/stores/instamart/p/muscleblaze-biozyme-performance-rich-chocolate-WV4XGQCZB5?storeId=836516"
         }
       ]
     }

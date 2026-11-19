@@ -91,6 +91,7 @@ function logoHtml(r) {
 
 function rowHtml(r, isBest) {
   const hasPrice = typeof r.price === 'number';
+  // Listed prices can reflect store discount codes or offers applied at the time of the check; checkout price may differ.
   const off = hasPrice && r.mrp ? Math.round((r.mrp - r.price) / r.mrp * 100) : 0;
   const tags = (isBest ? '<span class="cmp-tag">Cheapest</span>' : '');
   const right = hasPrice
@@ -152,7 +153,7 @@ fetch('compare-prices.json', { cache: 'no-cache' })
         document.getElementById('cmpStatus').textContent = state.liveOk
           ? 'MuscleBlaze price checked live. Other stores use last saved prices.'
           : 'Live MuscleBlaze price unavailable, showing last saved price.';
-        document.getElementById('cmpUpdated').textContent = 'Prices last updated ' + data.lastUpdated + '. Quick-commerce prices vary by location and may differ at checkout.';
+        document.getElementById('cmpUpdated').textContent = 'Prices last updated ' + data.lastUpdated + '. Prices may be after store discount codes or offers. Your final price at checkout can be different, and quick-commerce prices vary by location.';
       });
   })
   .catch(() => {
