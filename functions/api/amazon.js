@@ -47,11 +47,22 @@ async function signedHeaders(body, accessKey, secretKey) {
   };
 }
 
-async function lookup(q, env) {
+// Returns every pack size mentioned in the text, in grams (e.g. "2kg" -> 2000).
+function packGrams(text) {
+  const grams = [];
+  for (const m of String(text || '').matchAll(/(\d+(?:\.\d+)?)\s*(kg|g|gm|gms|grams?)\b/gi)) {
+    const n = Number(m[1]);
+    grams.push(/^k/i.test(m[2]) ? Math.round(n * 1000) : Math.round(n));
+  }
+  return grams;
+}
+
+async function lookup(q, size, env) {
+  const wanted = packGrams(size)[0];
   const body = JSON.stringify({
     Keywords: q,
     SearchIndex: 'All',
-    ItemCount: 3,
+    ItemCount: 10,
     PartnerTag: env.AMAZON_PARTNER_TAG,
     PartnerType: 'Associates',
     Resources: ['ItemInfo.Title', 'Offers.Listings.Price']
@@ -61,6 +72,8 @@ async function lookup(q, env) {
   if (!upstream.ok) throw new Error('amazon ' + upstream.status);
   const data = await upstream.json();
   for (const item of data.SearchResult?.Items || []) {
+    const title = item.ItemInfo?.Title?.DisplayValue || '';
+    if (wanted && !packGrams(title).includes(wanted)) continue;
     const listing = item.Offers?.Listings?.[0];
     const price = Number(listing?.Price?.Amount);
     if (Number.isFinite(price) && price > 0) {
@@ -79,6 +92,7 @@ async function lookup(q, env) {
 export async function onRequestGet({ request, env }) {
   const url = new URL(request.url);
   const q = (url.searchParams.get('q') || '').trim();
+  const size = (url.searchParams.get('size') || '').trim().slice(0, 40);
   if (q.length < 2 || q.length > 60) {
     return Response.json({ ok: false, error: 'Type at least 2 characters.' }, { status: 400 });
   }
@@ -87,12 +101,12 @@ export async function onRequestGet({ request, env }) {
   }
 
   const cache = caches.default;
-  const cacheKey = new Request(url.origin + '/api/amazon?q=' + encodeURIComponent(q.toLowerCase()));
+  const cacheKey = new Request(url.origin + '/api/amazon?q=' + encodeURIComponent(q.toLowerCase()) + '&size=' + encodeURIComponent(size.toLowerCase()));
   const cached = await cache.match(cacheKey);
   if (cached) return cached;
 
   try {
-    const result = await lookup(q, env);
+    const result = await lookup(q, size, env);
     const response = Response.json(result, {
       headers: { 'Cache-Control': `public, max-age=${CACHE_SECONDS}` }
     });

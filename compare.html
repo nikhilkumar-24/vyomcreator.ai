@@ -191,8 +191,9 @@ function choose(i) {
 
 async function loadAmazon(s) {
   const q = boardQuery(s);
+  const size = ((s.variant || '') + ' ' + (s.name || '')).match(/\d+(?:\.\d+)?\s*(?:kg|g|gm|gms|grams?)\b/i);
   try {
-    const res = await fetch('/api/amazon?q=' + encodeURIComponent(q));
+    const res = await fetch('/api/amazon?q=' + encodeURIComponent(q) + '&size=' + encodeURIComponent(size ? size[0] : ''));
     const data = await res.json();
     if (!data.ok) return;
     amazon = { q, price: data.price, url: data.url, title: data.title };
