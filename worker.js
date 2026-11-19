@@ -4,6 +4,7 @@ import { onRequestPost as beatlinePost } from './functions/api/beatline.js';
 import { onRequestPost as captionsPost } from './functions/api/captions.js';
 import { onRequestPost as chatPost } from './functions/api/chat.js';
 import { onRequestGet as priceGet } from './functions/api/price.js';
+import { onRequestGet as statsGet } from './functions/api/stats.js';
 
 const LEGACY_HOST = 'vyom.kurminkexam.workers.dev';
 const CANONICAL_ORIGIN = 'https://www.vyomcreator.ai';
@@ -31,6 +32,9 @@ export default {
     }
     if (url.pathname === '/api/price/muscleblaze' && request.method === 'GET') {
       return priceGet({ request, env, ctx });
+    }
+    if (url.pathname === '/api/stats' && request.method === 'GET') {
+      return statsGet({ request, env, ctx });
     }
     // Legacy/cached links to the old .html paths: send them to the clean URL instead of a dead end.
     const legacyRedirects = { '/index.html': '/hooks', '/sfx.html': '/sfx', '/beatline.html': '/beatline' };

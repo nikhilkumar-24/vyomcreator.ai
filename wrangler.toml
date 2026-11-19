@@ -9,3 +9,6 @@ run_worker_first = true
 
 [ai]
 binding = "AI"
+
+[vars]
+CF_ACCOUNT_ID = "ee2a1a5ffe9ae8e6cc605980d58d3e63"
