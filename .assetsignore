@@ -1,0 +1,12 @@
+node_modules
+.git
+.github
+.wrangler
+.dev.vars
+.env
+package.json
+package-lock.json
+wrangler.toml
+wrangler.local.toml
+worker.js
+functions
