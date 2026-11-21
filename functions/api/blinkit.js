@@ -46,7 +46,8 @@ export async function onRequestGet({ request, env }) {
 
   let data;
   try {
-    const params = new URLSearchParams({ query: q, lat: String(lat), lon: String(lon), page: String(page) });
+    // Scrappa rejects lat/lon with more than 6 decimal places.
+    const params = new URLSearchParams({ query: q, lat: lat.toFixed(6), lon: lon.toFixed(6), page: String(page) });
     const upstream = await fetch(`${SCRAPPA_URL}?${params}`, {
       headers: { 'X-API-KEY': env.SCRAPPA_API_KEY, Accept: 'application/json' }
     });
