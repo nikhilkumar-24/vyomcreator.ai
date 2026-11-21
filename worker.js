@@ -4,6 +4,8 @@ import { onRequestPost as beatlinePost } from './functions/api/beatline.js';
 import { onRequestPost as captionsPost } from './functions/api/captions.js';
 import { onRequestPost as chatPost } from './functions/api/chat.js';
 import { onRequestGet as amazonGet } from './functions/api/amazon.js';
+import { onRequestGet as blinkitGet } from './functions/api/blinkit.js';
+import { onRequestGet as geocodeGet } from './functions/api/geocode.js';
 import { onRequestGet as searchGet } from './functions/api/search.js';
 import { onRequestGet as statsGet } from './functions/api/stats.js';
 
@@ -33,6 +35,12 @@ export default {
     }
     if (url.pathname === '/api/amazon' && request.method === 'GET') {
       return amazonGet({ request, env, ctx });
+    }
+    if (url.pathname === '/api/blinkit' && request.method === 'GET') {
+      return blinkitGet({ request, env, ctx });
+    }
+    if (url.pathname === '/api/geocode' && request.method === 'GET') {
+      return geocodeGet({ request, env, ctx });
     }
     if (url.pathname === '/api/search' && request.method === 'GET') {
       return searchGet({ request, env, ctx });

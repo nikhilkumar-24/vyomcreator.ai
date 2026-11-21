@@ -52,6 +52,16 @@
 .cmp-cta { display: inline-block; font-size: 13px; font-weight: 600; background: #fafafa; color: #0a0a0a; padding: 9px 14px; border-radius: 8px; white-space: nowrap; }
 .cmp-row:not(.has-price) .cmp-cta { background: transparent; color: var(--muted); border: 1px solid var(--line); }
 .cmp-footnote { padding: 14px 18px; font-size: 12px; color: var(--subtle); border-top: 1px solid var(--line); }
+.cmp-location { margin-top: 24px; max-width: 640px; }
+.cmp-address { display: flex; gap: 8px; }
+.cmp-address .cmp-input { flex: 1; min-width: 0; }
+.cmp-btn { padding: 14px 16px; font-size: 14px; font-weight: 600; color: #0a0a0a; background: #fafafa; border: 0; border-radius: 12px; cursor: pointer; white-space: nowrap; }
+.cmp-btn:disabled { opacity: .6; cursor: default; }
+.cmp-location .cmp-status { margin-top: 8px; }
+@media (max-width: 640px) {
+  .cmp-address { flex-wrap: wrap; }
+  .cmp-address .cmp-btn { width: 100%; }
+}
 @media (max-width: 640px) {
   .cmp-row { grid-template-columns: 44px 1fr; gap: 12px 14px; }
   .cmp-logo { width: 44px; height: 44px; }
@@ -66,7 +76,14 @@
 <section class="cmp-head">
   <div class="eyebrow">ProteinPick · Supplement price comparison</div>
   <h1>Search a supplement</h1>
-  <p class="sub">Type a product name to see MuscleBlaze suggestions with live prices from MuscleBlaze and HealthKart, then compare with Amazon.in, Blinkit, Zepto and Swiggy Instamart.</p>
+  <p class="sub">Enter a delivery address to get the live Blinkit price there, then type a product name to see MuscleBlaze suggestions with live prices from MuscleBlaze and HealthKart, compared with Amazon.in, Blinkit, Zepto and Swiggy Instamart.</p>
+</section>
+<section class="cmp-location">
+  <form id="cmpAddressForm" class="cmp-address">
+    <input id="cmpAddress" class="cmp-input" type="text" placeholder="Delivery address, e.g. Whitefield, Bengaluru 560066" autocomplete="street-address" aria-label="Delivery address">
+    <button id="cmpAddressBtn" class="cmp-btn" type="submit">Check Blinkit price</button>
+  </form>
+  <span class="cmp-status" id="cmpLocation" aria-live="polite"></span>
 </section>
 <section class="cmp-search">
   <input id="cmpQ" class="cmp-input" type="text" placeholder="e.g. Biozyme, Creatine, Whey Isolate" autocomplete="off" aria-label="Search MuscleBlaze products" aria-controls="cmpSuggest" aria-expanded="false" role="combobox">
@@ -94,6 +111,7 @@ const STORES = [
   { name: 'HealthKart', color: '#16a34a', logo: 'logos/healthkart.svg', search: q => `https://www.healthkart.com/search?q=${encodeURIComponent(q)}` }
 ];
 const input = document.getElementById('cmpQ');
+const addressInput = document.getElementById('cmpAddress');
 const box = document.getElementById('cmpSuggest');
 let suggestions = [];
 let activeIdx = -1;
@@ -134,6 +152,22 @@ function byPrice(a, b) {
 
 let current = null;
 let amazon = null;
+let place = null;
+let blinkit = null;
+let blinkitRequest = 0;
+
+// Blinkit results for one product at one location: prefer in-stock MuscleBlaze listings and the pack size the user searched for.
+function pickBlinkit(items, size) {
+  const sizeKey = size ? size.replace(/\s+/g, '').toLowerCase() : null;
+  const candidates = items.filter(i => i.price != null && i.inStock !== false && /muscleblaze/i.test(i.name + ' ' + (i.brand || '')));
+  const sized = sizeKey ? candidates.filter(i => i.name.replace(/\s+/g, '').toLowerCase().includes(sizeKey)) : candidates;
+  return sized[0] || null;
+}
+
+function packSize(s) {
+  const m = ((s.variant || '') + ' ' + (s.name || '')).match(/\d+(?:\.\d+)?\s*(?:kg|g|gm|gms|grams?)\b/i);
+  return m ? m[0] : null;
+}
 
 function renderBoard(s) {
   const q = boardQuery(s);
@@ -149,6 +183,20 @@ function renderBoard(s) {
       name: st.name, logo: st.logo, color: st.color, price: az.price, mrp: null,
       url: az.url || st.search(q), cta: 'View on Amazon.in →', note: az.title || 'Price for "' + q + '" on Amazon.in'
     };
+    if (st.name === 'Blinkit') {
+      const bl = blinkit && blinkit.q === q && blinkit.size === packSize(s) ? blinkit : null;
+      const item = bl && bl.item;
+      let note = 'Opens search for "' + q + '" on Blinkit.';
+      if (!place) note = 'Enter a delivery address above to see the live Blinkit price.';
+      else if (!bl || bl.loading) note = 'Checking Blinkit price for ' + place.label + '…';
+      else if (bl.error) note = 'Blinkit price is unavailable right now.';
+      else if (!item) note = 'No in-stock MuscleBlaze listing found near ' + place.label + '.';
+      else note = item.name + (item.pack ? ' · ' + item.pack : '') + ' · Delivers to ' + place.label;
+      return {
+        name: st.name, logo: st.logo, color: st.color, price: item ? item.price : null, mrp: item ? item.mrp : null,
+        url: st.search(q), cta: item ? 'View on Blinkit →' : 'Search on Blinkit →', note
+      };
+    }
     const hk = st.name === 'HealthKart' && s.healthkart && typeof s.healthkart.price === 'number' ? s.healthkart : null;
     if (hk) return {
       name: st.name, logo: st.logo, color: st.color, price: hk.price, mrp: hk.mrp,
@@ -187,7 +235,61 @@ function choose(i) {
   current = s;
   renderBoard(s);
   loadAmazon(s);
+  loadBlinkit(s);
 }
+
+async function loadBlinkit(s) {
+  if (!place) return;
+  const q = boardQuery(s);
+  const size = packSize(s);
+  const id = ++blinkitRequest;
+  const at = place;
+  blinkit = { q, size, item: null, error: false, loading: true };
+  try {
+    const params = new URLSearchParams({ q, lat: String(at.lat), lon: String(at.lon) });
+    const res = await fetch('/api/blinkit?' + params);
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error);
+    blinkit = { q, size, item: pickBlinkit(data.items, size), error: false };
+  } catch (e) {
+    blinkit = { q, size, item: null, error: true };
+  }
+  if (id === blinkitRequest && current === s) renderBoard(s);
+}
+
+async function locate(address) {
+  const res = await fetch('/api/geocode?address=' + encodeURIComponent(address));
+  const data = await res.json().catch(() => null);
+  if (!res.ok || !data || !data.ok) throw new Error(data?.error || 'Could not find that address.');
+  return { lat: data.lat, lon: data.lon, label: data.label };
+}
+
+document.getElementById('cmpAddressForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const address = addressInput.value.trim();
+  const btn = document.getElementById('cmpAddressBtn');
+  const status = document.getElementById('cmpLocation');
+  if (address.length < 3) { status.textContent = 'Enter a delivery address.'; return; }
+  btn.disabled = true;
+  status.textContent = 'Finding your location…';
+  try {
+    place = await locate(address);
+    status.textContent = 'Blinkit prices for ' + place.label;
+  } catch (err) {
+    place = null;
+    status.textContent = err.message || 'Could not find that address.';
+  } finally {
+    btn.disabled = false;
+  }
+  blinkit = null;
+  blinkitRequest++;
+  if (place && current) {
+    renderBoard(current);
+    loadBlinkit(current);
+  } else if (current) {
+    renderBoard(current);
+  }
+});
 
 async function loadAmazon(s) {
   const q = boardQuery(s);
