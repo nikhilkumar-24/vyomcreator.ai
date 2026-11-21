@@ -47,18 +47,22 @@ async function signedHeaders(body, accessKey, secretKey) {
   };
 }
 
-// Returns every pack size mentioned in the text, in grams (e.g. "2kg" -> 2000).
-function packGrams(text) {
-  const grams = [];
-  for (const m of String(text || '').matchAll(/(\d+(?:\.\d+)?)\s*(kg|g|gm|gms|grams?)\b/gi)) {
+const LB_TO_KG = 0.453592;
+
+// Returns every pack size mentioned in the text, normalized to kg (lb is converted), rounded to the nearest gram.
+function packKg(text) {
+  const kg = [];
+  for (const m of String(text || '').matchAll(/(\d+(?:\.\d+)?)\s*(kgs?|kilograms?|g|gm|gms|grams?|lbs?|pounds?)\b/gi)) {
     const n = Number(m[1]);
-    grams.push(/^k/i.test(m[2]) ? Math.round(n * 1000) : Math.round(n));
+    const unit = m[2][0].toLowerCase();
+    const value = unit === 'k' ? n : unit === 'g' ? n / 1000 : n * LB_TO_KG;
+    kg.push(Math.round(value * 1000) / 1000);
   }
-  return grams;
+  return kg;
 }
 
 async function lookup(q, size, env) {
-  const wanted = packGrams(size)[0];
+  const wanted = packKg(size)[0];
   const body = JSON.stringify({
     Keywords: q,
     SearchIndex: 'All',
@@ -73,7 +77,7 @@ async function lookup(q, size, env) {
   const data = await upstream.json();
   for (const item of data.SearchResult?.Items || []) {
     const title = item.ItemInfo?.Title?.DisplayValue || '';
-    if (wanted && !packGrams(title).includes(wanted)) continue;
+    if (wanted && !packKg(title).includes(wanted)) continue;
     const listing = item.Offers?.Listings?.[0];
     const price = Number(listing?.Price?.Amount);
     if (Number.isFinite(price) && price > 0) {

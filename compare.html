@@ -157,16 +157,30 @@ let blinkit = null;
 let blinkitRequest = 0;
 
 // Blinkit results for one product at one location: prefer in-stock MuscleBlaze listings and the pack size the user searched for.
-function pickBlinkit(items, size) {
-  const sizeKey = size ? size.replace(/\s+/g, '').toLowerCase() : null;
+function pickBlinkit(items, sizeKg) {
   const candidates = items.filter(i => i.price != null && i.inStock !== false && /muscleblaze/i.test(i.name + ' ' + (i.brand || '')));
-  const sized = sizeKey ? candidates.filter(i => i.name.replace(/\s+/g, '').toLowerCase().includes(sizeKey)) : candidates;
+  const sized = sizeKg != null ? candidates.filter(i => weightsKg(i.name + ' ' + (i.pack || '')).includes(sizeKg)) : candidates;
   return sized[0] || null;
 }
 
-function packSize(s) {
-  const m = ((s.variant || '') + ' ' + (s.name || '')).match(/\d+(?:\.\d+)?\s*(?:kg|g|gm|gms|grams?)\b/i);
-  return m ? m[0] : null;
+const LB_TO_KG = 0.453592;
+
+// Every pack-size mention in text, normalized to kg (lb is converted), rounded to the nearest gram.
+function weightsKg(text) {
+  const out = [];
+  for (const m of String(text || '').matchAll(/(\d+(?:\.\d+)?)\s*(kgs?|kilograms?|g|gm|gms|grams?|lbs?|pounds?)\b/gi)) {
+    const n = Number(m[1]);
+    const unit = m[2][0].toLowerCase();
+    const kg = unit === 'k' ? n : unit === 'g' ? n / 1000 : n * LB_TO_KG;
+    out.push(Math.round(kg * 1000) / 1000);
+  }
+  return out;
+}
+
+// MuscleBlaze's own pack size for this product, normalized to kg.
+function packSizeKg(s) {
+  const kg = weightsKg((s.variant || '') + ' ' + (s.name || ''));
+  return kg.length ? kg[0] : null;
 }
 
 function renderBoard(s) {
@@ -184,7 +198,7 @@ function renderBoard(s) {
       url: az.url || st.search(q), cta: 'View on Amazon.in →', note: az.title || 'Price for "' + q + '" on Amazon.in'
     };
     if (st.name === 'Blinkit') {
-      const bl = blinkit && blinkit.q === q && blinkit.size === packSize(s) ? blinkit : null;
+      const bl = blinkit && blinkit.q === q && blinkit.size === packSizeKg(s) ? blinkit : null;
       const item = bl && bl.item;
       let note = 'Opens search for "' + q + '" on Blinkit.';
       if (!place) note = 'Enter a delivery address above to see the live Blinkit price.';
@@ -241,18 +255,18 @@ function choose(i) {
 async function loadBlinkit(s) {
   if (!place) return;
   const q = boardQuery(s);
-  const size = packSize(s);
+  const sizeKg = packSizeKg(s);
   const id = ++blinkitRequest;
   const at = place;
-  blinkit = { q, size, item: null, error: false, loading: true };
+  blinkit = { q, size: sizeKg, item: null, error: false, loading: true };
   try {
     const params = new URLSearchParams({ q, lat: String(at.lat), lon: String(at.lon) });
     const res = await fetch('/api/blinkit?' + params);
     const data = await res.json();
     if (!data.ok) throw new Error(data.error);
-    blinkit = { q, size, item: pickBlinkit(data.items, size), error: false };
+    blinkit = { q, size: sizeKg, item: pickBlinkit(data.items, sizeKg), error: false };
   } catch (e) {
-    blinkit = { q, size, item: null, error: true };
+    blinkit = { q, size: sizeKg, item: null, error: true };
   }
   if (id === blinkitRequest && current === s) renderBoard(s);
 }
@@ -293,7 +307,7 @@ document.getElementById('cmpAddressForm').addEventListener('submit', async e => 
 
 async function loadAmazon(s) {
   const q = boardQuery(s);
-  const size = ((s.variant || '') + ' ' + (s.name || '')).match(/\d+(?:\.\d+)?\s*(?:kg|g|gm|gms|grams?)\b/i);
+  const size = ((s.variant || '') + ' ' + (s.name || '')).match(/\d+(?:\.\d+)?\s*(?:kgs?|kilograms?|g|gm|gms|grams?|lbs?|pounds?)\b/i);
   try {
     const res = await fetch('/api/amazon?q=' + encodeURIComponent(q) + '&size=' + encodeURIComponent(size ? size[0] : ''));
     const data = await res.json();
