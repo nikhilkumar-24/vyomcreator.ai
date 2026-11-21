@@ -37,6 +37,14 @@ The AI is asked to score five dimensions from 0–100: opening hook (25%), story
 If the app reports fallback mode, open Cloudflare Dashboard → Workers & Pages → your Pages project → Settings → Functions → Bindings → Add binding → Workers AI. Set the variable name to exactly `AI`, save, and redeploy. Pages bindings must be configured for the project/environment and a new deployment is required for changes to take effect. The app now tries Gemma 4 vision first, retries text-only inference if needed, and falls back to clearly labeled heuristic recommendations if both model calls fail. Check the Pages Functions logs for the exact provider error (quota, model access, binding, or request validation).
 
 
+## Blinkit prices (Scrappa)
+
+The ProteinPick Blinkit row calls `/api/blinkit`, which needs a Scrappa API key. Without it the endpoint returns `Blinkit prices are not configured.` (HTTP 503).
+
+- Deployed: `npx wrangler secret put SCRAPPA_API_KEY` and paste the key.
+- Local: `cp .dev.vars.example .dev.vars`, set `SCRAPPA_API_KEY`, then run `npx wrangler pages dev .`. `.dev.vars` is gitignored.
+
+
 ## Model configuration
 
 The AI binding is named `AI`. The backend tries `@cf/google/gemma-4-26b-a4b-it` for frame-aware analysis first and falls back to `@cf/zai-org/glm-4.7-flash` for text-only suggestions. GLM-4.7-Flash is a text model; in fallback mode the response must not claim to have inspected video frames.
